@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../jquery-3.3.1.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <p class="protected">Hello world!</p>
+    <p class="value"><b>Values: </b></p>
+    <form>
+        <input type="text" name="name" value="John"/>
+        <input type="text" name="password" value="password"/>
+        <input type="text" name="url" value="http://ejohn.org/"/>
+    </form>
+        <ul>
+            <li>list item 1</li>
+            <li>list item 2
+              <ul>
+                <li>list item 2-a</li>
+                <li>list item 2-b</li>
+              </ul>
+            </li>
+            <li>list item 3</li>
+            <li>list item 4</li>
+        </ul>
+
+        <div style="width:70%;position:absolute;left:200px;top:200px">
+            <div style="margin:50px;background-color:yellow">
+                <p>点击下面的按钮可以设置本段落的最近的父（祖先）元素的背景色。</p>
+            <div>
+        </div>
+        <button class="offsetp">点击这里</button>
+
+    <script>
+        //hasClass
+        $("p").click(function(){
+            if( $(this).hasClass("protected")) {
+                $(this).fadeIn("slow")
+                  .fadeOut("slow")
+                  .fadeIn("slow")
+                  .fadeOut("slow")
+                  .fadeIn("slow")
+            }
+        });
+
+        //map将一组元素转换成其他数组
+        $(".value").append( $("input").map(function(){
+            return $(this).val();
+        }).get().join(", ") );
+
+        //has保留包含特定后代的元素，去掉那些不含有指定后代的元素。反义not，用法类似
+        $('li').has('ul').css('background-color', 'red');
+
+        //offsetParent()
+        $(".offsetp").click(function(){
+            $("p").offsetParent().css("background-color","red");
+        })
+
+
+    </script>
+</body>
+</html>

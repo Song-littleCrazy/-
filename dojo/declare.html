@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require([
+            'dojo/_base/declare',
+            'dojo/domReady!'
+        ], function (declare) {
+
+            //declare继承和扩展类
+            var F = function () { console.log("raw constructor"); };
+            F.prototype.method = function () {
+                console.log("raw method");
+            };
+            //表示A是从F那继承过来的，所以调用同名函数的时候先显示F的东西，再显示A的
+            var A = declare(F, {
+                constructor: function () {
+                    console.log("A.constructor");
+                },
+                method: function () {
+                    console.log("before calling F.method...");
+                    this.inherited(arguments); //手动调用
+                    console.log("...back in A");
+                }
+            });
+            var a = new A();//创建一个A类
+            //raw constructor
+            //A.constructor
+            a.method();//调用method方法
+            //before calling F.method...
+            //raw method
+            //...back in A
+
+
+            //-chains-可以设置after——先用父类的某函数，再调用子类中对应的函数
+            //before相反——先调用子类的某函数，再调用父类中对应的函数
+            //manual——只能用this.inherited()的方法手动调用
+            var A = declare(null, {
+                "-chains-": {
+                    destroy: "before"
+                }
+            });
+            var B = declare(A, {
+                constructor: function () {
+                    console.log("B.constructor");
+                },
+                destroy: function () {
+                    console.log("B.destroy");
+                }
+            });
+            var C = declare(B, {
+                constructor: function () {
+                    console.log("C.constructor");
+                },
+                destroy: function () {
+                    console.log("C.destroy");
+                }
+            });
+            new C().destroy();
+            // prints:
+            // B.constructor
+            // C.constructor
+            // C.destroy
+            // B.destroy
+
+            var A = declare(null, {
+                "-chains-": {
+                    m1: "before"
+                },
+                m1: function () {
+                    console.log("A.m1");
+                },
+                m2: function () {
+                    console.log("A.m2");
+                }
+            });
+            var B = declare(A, {
+                "-chains-": {
+                    m2: "after"
+                },
+                m1: function () {
+                    console.log("B.m1");
+                },
+                m2: function () {
+                    console.log("B.m2");
+                }
+            });
+            var x = new B();
+            x.m1();
+            // B.m1
+            // A.m1
+            x.m2();
+            // A.m2
+            // B.m2
+
+            //safeMixin用于实现使用declare生成的构造函数的extend方法。
+            var A = declare(null, {
+                m1: function () {
+                    console.log("A.m1");
+                },
+                m2: function () {
+                    console.log("A.m2");
+                }
+            });
+            var B = declare(A, {
+                m1: function () {
+                    this.inherited(arguments);
+                    console.log("B.m1");
+                }
+            });
+            B.extend({
+                m2: function () {
+                    this.inherited(arguments);
+                    console.log("B.m2");
+                }
+            });
+            var x = new B();
+            dojo.safeMixin(x, {
+                m1: function () {
+                    this.inherited(arguments);
+                    console.log("X.m1");
+                },
+                m2: function () {
+                    this.inherited(arguments);
+                    console.log("X.m2");
+                }
+            });
+            x.m1();
+            // A.m1
+            // B.m1
+            // X.m1
+
+            // //用mixin修改多继承
+            // var A = { a: 1, b: 2 };
+            // var B = { b: 3, c: 4 };
+            // mixin(A, B);
+            // console.log(A);
+            // console.log(B);
+        })
+
+    </script>
+</body>
+
+</html>

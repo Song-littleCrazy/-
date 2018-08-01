@@ -1,0 +1,39 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Demo: Using _TemplatedMixin</title>
+		<link rel="stylesheet" href="dojo-release-1.13.0/dijit/themes/claro/claro.css" media="screen">
+	</head>
+	<body class="claro">
+        <span data-dojo-type="Counter"></span>
+		
+		<script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="parseOnLoad: false"></script>
+		<script>
+			require([
+                "dojo/_base/declare",
+                "dojo/dom-construct",
+                "dojo/parser",
+                "dojo/ready",
+				"dijit/_WidgetBase",
+			], function(declare,domConstruct,parser,ready,_WidgetBase) {
+				declare("Counter",[_WidgetBase],{
+                    _i:0,
+                    buildRendering:function(){
+                        this.domNode = domConstruct.create("button",{innerHTML:this._i});
+                    },
+                    postCreate: function(){
+                        this.connect(this.domNode,"onclick","increment");
+                    },
+                    increment:function(){
+                        this.domNode.innerHTML = ++this._i;
+                    }
+                });
+                ready(function(){
+				    parser.parse();
+                });
+			});
+		</script>
+	</body>
+</html>

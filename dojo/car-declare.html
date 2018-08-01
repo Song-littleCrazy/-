@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+
+
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require([
+            'dojo/_base/declare',
+            'dojo/domReady!'
+        ], function (declare) {
+            declare("car", null, {
+                reg_no: "",
+                current_speed: 0,
+                current_gear: 0,
+                constructor: function (reg_no) {
+                    this.reg_no = reg_no;
+                },
+                accelerate: function (increment) {
+                    this.current_speed += increment;
+                },
+                decelerate: function (decrement) {
+                    this.current_speed -= decrement;
+                },
+                increaseGear: function () {
+                    this.current_gear++;
+                },
+                decreaseGear: function () {
+                    this.current_gear--;
+                }
+            });
+            var mycar = new car("10c500");
+            mycar.accelerate(30);
+            mycar.accelerate(20);
+            mycar.decelerate(5);
+            console.log(mycar.reg_no + " travelling at " + mycar.current_speed + " mph");
+            //10c500 travelling at 45 mph
+
+            //用declare创建ATcar继承car
+            declare("ATcar", car, {
+                accelerate: function (increment) {
+                    this.inherited(arguments);
+                    //这个是一个dojo的内部方法，用来向基类查找该代码所在的方法，然后调用它，直到找到为止。
+                    if (increment >= 10) this.increaseGear();
+                },
+                decelerate: function (decrement) {
+                    this.inherited(arguments);
+                    if (decrement >= 10) this.decreaseGear();
+                }
+            })
+            //再次调用
+            var myCar = new ATcar("10C500");
+            myCar.accelerate(30);
+            myCar.accelerate(20);
+            myCar.decelerate(5);
+            console.log(myCar.reg_no + " travelling at " + myCar.current_speed + " mph in gear "+myCar.current_gear);
+            //10C500 travelling at 45 mph in gear 2
+            
+        })
+
+    </script>
+</body>
+
+</html>

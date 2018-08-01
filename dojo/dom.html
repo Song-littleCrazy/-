@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Demo: The Dijit Lifecycle</title>
+    <link rel="stylesheet" href="dojo-release-1.13.0/dijit/themes/claro/claro.css" media="screen">
+</head>
+
+<body>
+
+    <h3>dom中dom.byId用法：</h3>
+    <ul id="list">
+        <li id="one">One</li>
+        <li id="two">Two</li>
+        <li id="three">Three</li>
+        <li id="four">Four</li>
+        <li id="five">Five</li>
+    </ul>
+
+    <button id="moveFirst">The first item</button>
+    <button id="moveBeforeTwo">Before Two</button>
+    <button id="moveAfterFour">After Four</button>
+    <button id="moveLast">The last item</button>
+
+    <button id="destroyFirst">Destroy the first list item</button>
+    <button id="destroyAll">Destroy all list items</button>
+
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require([ "dojo/on", "dojo/dom", "dojo/dom-construct", "dojo/domReady!"],
+            function (on, dom, domConstruct) {
+
+                //dom.byId获取元素，找到则返回具有该id的dom节点对象，找不到，返回空值null。
+                //相当于使用document.getElementById，但有两个优点：它的类型更短，并且它适用于某些浏览器的错误实现getElementById。另一个很好的特性dom.byId是，当它传递一个DOM节点时，它会立即返回该节点。这有助于创建同时包含字符串和DOM节点的API。
+                function setText(node, text) {
+                    node = dom.byId(node);
+                    node.innerHTML = text;
+                }
+                setText("two", "Two has been set as well");
+                console.log(dom.byId("six"));//null
+
+                //用dom-construct中的create创建新元素，并根据父兄元素放到附近位置（默认last）
+                var list = dom.byId("list"), three = dom.byId("three");
+
+                domConstruct.create("li", {
+                    innerHTML: "Six",
+                    className: "six",
+                    style: {
+                        fontWeight: "blod"
+                    }
+                }, list);
+
+                domConstruct.create("li", {
+                    innerHTML: "Three and a half"
+                }, three, "after");
+
+                //用dom-construct中的place放置元素的位置
+                //位置相关的有可能值是“before”，“after”，“replace”，“only”，“first”和“last”
+                function moveFirst() {
+                    var list = dom.byId("list"),
+                        three = dom.byId("three");
+                    domConstruct.place(three, list, "first");
+                }
+
+                function moveBeforeTwo() {
+                    var two = dom.byId("two"),
+                        three = dom.byId("three");
+                    domConstruct.place(three, two, "before");
+                }
+
+                function moveAfterFour() {
+                    var four = dom.byId("four"),
+                        three = dom.byId("three");
+                    domConstruct.place(three, four, "after");
+                }
+
+                function moveLast() {
+                    var list = dom.byId("list"),
+                        three = dom.byId("three");
+                    domConstruct.place(three, list);
+                }
+
+                // 选中按钮
+                on(dom.byId("moveFirst"), "click", moveFirst);
+                on(dom.byId("moveBeforeTwo"), "click", moveBeforeTwo);
+                on(dom.byId("moveAfterFour"), "click", moveAfterFour);
+                on(dom.byId("moveLast"), "click", moveLast);
+
+                //销毁，两种方法：destroy销毁一个节点和所有的子节点和empty消除指定节点的子节点
+                function destroyfirst() {
+                    var list = dom.byId("list"),
+                        items = list.getElementsByTagName("li");
+
+                    if (items.length) {
+                        domConstruct.destroy(items[0]);
+                    }
+                }
+                function destroyall() {
+                    domConstruct.empty("list");
+                }
+
+                on(dom.byId("destroyFirst"), "onclick", destroyfirst);
+                on(dom.byId("destroyAll"), "onclick", destroyall);
+            });
+
+    </script>
+</body>
+
+</html>

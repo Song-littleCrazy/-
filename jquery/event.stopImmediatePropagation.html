@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../jquery-3.3.1.js"></script>
+    <title>Document</title>
+    <style>  
+        p { height: 30px; width: 150px; background-color: #ccf; }
+        div {height: 40px; width: 200px; background-color: #cfc; }  
+    </style>
+</head>
+<body>
+        <div><p>paragraph</p><div>
+        <div class="red">division</div>
+    <script>
+        //event.stopImmediatePropagation()用来阻止生于时间的处理函数执行，并调用event.stopPropagation()防止事件冒泡到dom树上
+        //event.stopPropagation()仅停止事件冒泡到前辈元素上，而让这个元素上的其他事件处理函数继续执行
+        //event.isImmediatePropagation()确定这个方法是否(在那个时间对象上)被调用
+    $("p").click(function(event){
+        event.stopImmediatePropagation();//父子元素的颜色不会变红
+    });
+    //$("p").click(function(event){
+    //   event.stopPropagation();          //子颜色会变红，父元素颜色不变
+    //});
+    $("p").click(function(event){
+        // This function won't be executed
+        $(this).css("background-color", "#f00");
+    });
+    $(".red").click(function(event) {
+        // This function will be executed
+        $(this).css("background-color", "#f00");
+    });  
+    
+    </script>
+</body>
+</html>

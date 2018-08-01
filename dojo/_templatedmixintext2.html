@@ -1,0 +1,56 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Demo: Using _TemplatedMixin</title>
+        <link rel="stylesheet" href="dojo-release-1.13.0/dijit/themes/claro/claro.css" media="screen">
+        <style type="text/css">
+        .businessCard {
+            border: 3px inset gray;
+            margin: 1em;
+        }
+        .employeeName {
+            color: blue;
+        }
+        .specialEmployeeName {
+            color: red;
+        }
+        </style>
+	</head>
+	<body class="claro">
+        <span data-dojo-type="BusinessCard" data-dojo-props="name:'John Smith', phone:'(800) 555-1212'"></span>
+        <span data-dojo-type="BusinessCard" data-dojo-props="name:'Jack Bauer', nameClass:'specialEmployeeName', phone:'(800) CALL-CTU'"></span>    
+            
+		<script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="parseOnLoad: false"></script>
+		<script>
+			require([
+                "dojo/_base/declare",
+                "dojo/parser",
+                "dojo/ready",
+                "dijit/_WidgetBase",
+                "dijit/_TemplatedMixin"
+			], function(declare,parser,ready,_WidgetBase,_TemplatedMixin) {
+				declare("BusinessCard",[_WidgetBase,_TemplatedMixin],{
+                    templateString:"<div class='businessCard'>"+
+                        "<div>Name: <span data-dojo-attach-point='nameNode'></span></div>"+
+                        "<div>Phone#: <span data-dojo-attach-point='phoneNode'></span></div>"+
+                        "</div>",
+
+                    name:"unknow",
+                    _setNameAttr:{ node:"nameNode", type:"innerHTML"},
+
+                    nameClass:"employeeName",
+                    _setNameClassAttr:{ node:"nameNode", type:"class"},
+
+                    phone:"unknow",
+                    _setPhoneAttr:{ node:"phoneNode", type:"innerHTML"}
+                });
+                ready(function(){
+                    //
+				    parser.parse();
+                });
+			});
+		</script>
+	</body>
+</html>

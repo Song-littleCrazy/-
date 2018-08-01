@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+	
+	<script>dojoConfig = {parseOnLoad: false}</script>
+	<script src='dojo-release-1.13.0/dojo/dojo.js'></script>
+	
+	<script>
+require([
+    "dojo/_base/declare", "dojo/parser", "dojo/ready",
+    "dijit/_WidgetBase",
+], function(declare, parser, ready, _WidgetBase){
+
+    declare("MyFirstBehavioralWidget", [_WidgetBase], {
+        // put methods, attributes, etc. here
+    });
+    ready(function(){
+        // Call the parser manually so it runs after our widget is defined, and page has finished loading
+        parser.parse();
+    });
+});
+	</script>
+</head>
+<body class="claro">
+    <span data-dojo-type="MyFirstBehavioralWidget">hi</span>
+</body>
+</html>

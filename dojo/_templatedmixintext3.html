@@ -1,0 +1,37 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Demo: Using _TemplatedMixin</title>
+        <link rel="stylesheet" href="dojo-release-1.13.0/dijit/themes/claro/claro.css" media="screen">   
+	</head>
+	<body class="claro">
+        <span data-dojo-type="HidePane" data-dojo-props="open:false" data-dojo-id="pane">this pane is initially hidden</span>
+        <button onclick="pane.set('open',true);">show</button>
+        <button onclick="pane.set('open',false);">hide</button>
+
+        <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="parseOnLoad: false"></script>
+		<script>
+			require([
+                "dojo/_base/declare",
+                "dojo/dom-style",
+                "dojo/parser",
+                "dojo/ready",
+                "dijit/_WidgetBase",
+                "dijit/_TemplatedMixin"
+			], function(declare,domStyle,parser,ready,_WidgetBase,_TemplatedMixin) {
+				declare("HidePane",[_WidgetBase],{
+                    open: true,
+                    _setOpenAttr: function(open){
+                        this._set("open",open);
+                        domStyle.set(this.domNode,"display",open?"block":"none");
+                    }    
+                });
+                ready(function(){
+				    parser.parse();
+                });
+			});
+		</script>
+	</body>
+</html>

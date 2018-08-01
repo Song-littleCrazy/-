@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../jquery-3.3.1.js"></script>
+       <title>Document</title>
+    <style>
+
+    </style>
+</head>
+<body>
+        <p>Hello</p>
+        <p>2nd Paragraph</p>
+        <p>3rd Paragraph</p>
+        <p>4th Paragraph</p>
+        <p>5th Paragraph</p>
+        <button>改变p的行高</button>
+    <script>
+//根据offset获取位置信息,当前窗口的相对偏移量
+var pl = $("p:last");
+var offset = pl.offset();
+pl.html("left "+offset.left+", top: "+offset.top);
+
+//用offset设置属性的位置
+$("p:last").offset({top: 100, left:30});
+
+//根据position获取位置信息，相对父元素的偏移量
+var pf = $("p:first");
+var position = pf.position();
+$("p:first").html("left: "+position.left+"  top: "+position.top);
+
+//根据scrollTop/scrollLeft获取位置信息,相对于滚动轴
+var p2 = $("p:nth-of-type(2)");
+p2.text("scrollTop: "+p2.scrollTop()+"scrollLeft: "+p2.scrollLeft());
+
+//用height/width改变行高和行宽
+$("button").click(function() {
+    $("p").height(function(n,c){
+        return c+10;
+    });
+    $("p").width(function(n,c){
+        return c+10;
+    });
+});
+
+//用innerHeight/innerHWidth获取一个匹配元素内部区域的高度和宽（包括补白，不包括边框）
+var p3 = $("p:nth-of-type(3)");
+p3.text("innerHeight: "+p3.innerHeight()+"  innerHWidth: "+p3.innerWidth());
+
+
+//用outerHeight/outerHWidth获取一个匹配元素内部区域的高度和宽（包括补白，边框）
+var p4 = $("p:nth-of-type(4)");
+p4.text("outerHeight: "+p4.outerHeight()+"  outerHWidth: "+p4.outerWidth());
+
+
+
+
+
+
+    </script>
+</body>
+</html>

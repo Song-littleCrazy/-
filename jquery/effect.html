@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../jquery-3.3.1.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <p style="display: none">Hello</p>
+    <button class="show">show</button>
+    <button class="hide">hide</button>
+
+    <h1 style="display: none">Miss.Song</h1>
+    <button class="slidedown">slidedown</button>
+    <button class="slideup">slideup</button>
+
+    <h2 style="display: none">Welcom to~</h2>
+    <button class="fadein">fadein</button>
+    <button class="fadeout">fadeout</button>
+    <button class="fadeto">fadeto</button>
+
+    <h3>dist</h3>
+    <script>
+        //show显示隐藏的元素,速度（+切换效果+动画完成时执行的函数）
+        $(".show").click(function() {
+            $("p").show("slow","linear",function() {
+                $(this).text("Animation Done!");
+            });
+        });
+
+        //hide隐藏显示的元素
+        $(".hide").click(function() {
+            $("p").hide("fast",function() {
+                alert("Hiden Done!");
+            });
+        });
+
+        //toggle用于绑定两个或多个事件处理器函数，以响应被选元素的轮流的 click 事件。
+        //如果元素是可见的，切换为隐藏的；如果元素是隐藏的，切换为可见的。
+        $("p").toggle("fast");
+
+        //slideDown通过高度变化（向下增大）来动态地显示所有匹配的元素，在显示完成后可选地触发一个回调函数。        
+        $(".slidedown").click(function() {
+            $("h1").slideDown("slow",function() {
+                alert("slide Down!");
+            });
+        });
+
+        //slideUp通过高度变化（向下增大）来动态地显示所有匹配的元素，在显示完成后可选地触发一个回调函数。        
+        $(".slideup").click(function() {
+            $("h1").slideUp("slow",function() {
+                alert("slide up!");
+            });
+        });
+
+        //slideToggle通过高度变化来切换所有匹配元素的可见性.这个动画效果只调整元素的高度，可以使匹配的元素以“滑动”的方式隐藏或显示。
+        $("h1").slideToggle("fast");
+
+        //fadeIn通过不透明度的变化来实现所有匹配元素的淡入效果        
+        $(".fadein").click(function() {
+            $("h2").fadeIn("slow");
+        });
+
+        $(".fadeout").click(function() {
+            $("h2").fadeOut("slow");
+        });
+
+        //把所有匹配元素的不透明度以渐进方式调整到指定的不透明度
+        $(".fadeto").click(function() {
+            $("h2").fadeTo("slow",0.66);
+        });
+
+        //设置一个延时来推迟执行队列中之后的项目。
+        $('h3').slideUp(2000).delay(800).fadeIn(400);
+    </script>
+</body>
+</html>

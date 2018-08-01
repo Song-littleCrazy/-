@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../jquery-3.3.1.js"></script>
+    <style>  ul, li {     padding: 8px; display: block; border: 1px solid #999;  }      </style>
+    <title>Document</title>
+</head>
+<body>
+    <button>display event.result</button>
+    <p></p>
+
+    <a href="http://jquery.com">default click action is prevented</a>
+    <div id="hello"></div>
+
+    <div id="log"></div>
+    <ul>
+      <li>item 1
+        <ul>
+          <li>sub item 1-a</li>
+          <li>sub item 1-b</li>
+        </ul>
+      </li>
+      <li>item 2
+        <ul>
+          <li>sub item 2-a</li>
+          <li>sub item 2-b</li>
+        </ul> 
+      </li>
+    </ul>
+
+    <input id="whichkey" value="type something">
+    <div id="foo"></div>
+
+    <div class="crazy"></divclass>
+
+    <script>
+        //event.result当前时间组后触发的那个处理函数的返回值
+        $("button").click(function(event){  return "hey";  });
+        $("button").click(function(event){  
+            $("p").html(event.result);
+        });      
+
+        //event.preventDefault()阻止默认事件行为的触发
+        $("a").click(function(event) {
+            event.preventDefault();
+            $('<div/>').append('default ' + event.type + ' prevented').appendTo('#hello');
+        });
+
+  //event.target最初触发的dom元素
+  $("body").click(function(event) {
+    $("#log").html("clicked: " + event.target.nodeName); 
+  });
+
+  function handler(event) {
+    var $target = $(event.target);
+    if( $target.is("li") ) {
+      $target.children().toggle();  //toggle方法用来切换元素的可见状态
+    }
+  }
+  $("ul").click(handler).find("ul").hide();
+
+  //event.type显示事件类型；
+  //event.which确定鼠标或键盘按的是哪个按钮
+  $('#whichkey').bind('keydown',function(e){
+  $('#foo').html(e.type + ': ' +  e.which );  });
+  
+  //pageX/pageY确定当前鼠标的位置
+  $(document).bind('mousemove',function(e){
+      $(".crazy").text("e.pageX: "+e.pageX+"  e.pageY: "+e.pageY);
+  });
+    </script>
+</body>
+</html>

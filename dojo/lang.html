@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tutorial: Hello Dojo!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require([
+            'dojo/_base/lang',
+            'dojo/domReady!'
+        ], function (lang) {
+            //clone浅拷贝除了循环体以外的任何东西
+            var arr = [1, 2, 3];
+            var carr = lang.clone(arr);
+            carr[1] = 5;
+            console.log(arr);  //[1,2,3]
+            console.log(carr); //[1,5,3]
+
+            //delegate浅拷贝+扩展
+            var foo = { bar: "baz" };
+            var thinger = lang.delegate(foo, { thud: "xyz" });
+            console.log(foo);  //[bar: "baz"]
+            console.log(thinger.bar);  //baz
+            console.log(thinger.thud); //xyz
+            foo.bar = "abc";
+            console.log(thinger.bar);  //abc
+
+            //exists判断是否存在，前两种格式等价
+            console.log(lang.exists("foo.bar"));  //true
+            console.log(lang.exists("bar", foo));  //true
+            console.log(lang.exists("foo.bar.baz"));  //true
+
+            //hitch（方法执行时的范围+函数）改变某种东西
+            var fun = {
+                boo: function (a, b, c) {
+                    console.log(a, b, c);
+                }
+            };
+            var fn = lang.hitch(fun, "boo", 1, 2);
+            fn(3);  //1 2 3
+
+            lang.hitch(foo, function () { this.bar = "num"; })();
+            console.log(foo.bar);  //num
+            console.log(thinger.bar);  //num
+
+
+            //mixin浅拷贝
+            var copy = lang.mixin({}, foo);
+            console.log(copy);  //bar:num
+
+            var flattened = lang.mixin(
+                {
+                    name: "Frylock",
+                    braces: true
+                },
+                {
+                    name: "Carl Brutanananadilewski"
+                }
+            );
+            console.log(flattened.name); //"Carl Brutanananadilewski"   
+            console.log(flattened.braces); //"true"
+
+            //replace替换
+            console.log(lang.replace("Hello, {name.first} {name.last} AKA {nick}!",
+                {
+                    nick: "Bob",
+                    name: {
+                        first: "Robert",
+                        middle: "X",
+                        last: "Cringely"
+                    }
+                })
+            )   // returns: Hello, Robert Cringely AKA Bob!
+
+            lang.replace("Hello, {0} {2}!",
+                ["Robert", "X", "Cringely"]);
+            // returns: Hello, Robert Cringely!
+
+            // //setObject改变对象的值
+            // if(!obj["parent"]){ obj.parent = {}; }
+            // if(!obj.parent["child"]){ obj.parent.child = {}; }
+            // obj.parent.child.prop = "some value";
+            // //等价替换成一下形式
+            // lang.setObject("parent.child.prop","some value",obj);
+
+
+        })
+
+    </script>
+</body>
+
+</html>

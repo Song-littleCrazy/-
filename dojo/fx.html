@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-fx!</title>
+    <style>
+        #greeting {
+            color: white;
+            background-color: aquamarine;
+            width: 200px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <p id="greeting">Hello, Crazy!</p>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require([
+            'dojo/_base/fx',
+            'dojo/domReady!'
+        ], function (fx) {
+            //anim相当于animateProperty的简化形式，不用写名称，直接把改变的东西放在()里面
+            //opacity:1相当于fadeIn，opacity:0相当于fadeOut
+            fx.anim("greeting",{opacity: 1},3000);
+
+            //animateProperty定义具体的变量，并设置相应的值
+            fx.animateProperty({
+                node: "greeting",
+                duration: 2000,
+                properties: { 
+                    width: { start:'200', end: '400',units: 'px'},
+                    paddingTop: {start:'5', end: '50', units: 'px'}
+                }
+            }).play();
+            
+            //fadeOut和fadeIn是淡化成透明，和变成不透明
+            fx.fadeOut({
+                node: "greeting",
+                duration: 2000
+
+            }).play();
+        })
+    </script>
+</body>
+
+</html>

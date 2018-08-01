@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <p class="greeting">Hello, Miss.Song!</p>
+    <p class="greeting">Hello, Little!</p>
+    <p class="greeting">Hello, Crazy!</p>
+
+    <button id="b1"></button>
+    <button id="b2"></button>    
+    <form id="thisForm"> 
+        <input type="text">
+        <button id="formB"></button>
+    </form>
+
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require([
+            //query中如果是css3样式，后面要加!css3,其他的也类似，如（acme，sizzle）
+            //也可以再引入时加入<script data-dojo-config="query-selector:'css3'" src="dojo.js">
+            'dojo/query!css3',
+            'dojo/domReady!'
+        ], function (query) {
+            //query简单的查询功能，返回一个NodeList(支持链式调用.)
+            console.log(query("p.greeting"));// [p.greeting,p.greeting,p.greeting]
+
+            //查询所有的button
+            console.log(query("button"));//[button#b1, button#b2, button#formB]
+            console.log(query("button").length);//3
+
+            //链式调用
+            //dojo/query将on()方法定义为NodeList的一部分，所以可以直接引用
+            query("button").on("click",function(){ alert("welcome"); });
+            
+            //NodeList的forEach方法
+            query("button").forEach(function(node,index,array){
+                node.innerHTML = "new button" + index;
+            });
+        })
+    </script>
+</body>
+
+</html>
