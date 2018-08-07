@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require(["dojo/_base/lang", "dojo/_base/declare"], function (lang, declare) {
+            var A = declare(null, {
+                m1: function () {
+                    console.log("A.m1");
+                    console.log(arguments);
+                },
+                m2: function () {
+                    console.log("A.m2");
+                    console.log(arguments);
+                },
+                m3: function () {
+                    console.log("A.m3");
+                    console.log(arguments);
+                },
+                m4: function () {
+                    console.log("A.m4");
+                    console.log(arguments);
+                },
+                m5: function () {
+                    console.log("A.m5");
+                    console.log(arguments);
+                }
+            });
+
+            var B = declare(A, {
+                m1: function () {
+                    // simple super call with the same arguments
+                    this.inherited(arguments);
+                    console.log("B.m11");
+                    // super call with new arguments
+                    this.inherited(arguments, [1, 2, 3]);
+                    console.log("B.m12");
+                    console.log(arguments);
+                }
+            });
+
+            // extend B using extend()
+            B.extend({
+                m2: function () {
+                    // this method is going to be properly annotated =>
+                    // we can use the same form of this.inherited() as
+                    // normal methods:
+                    // simple super call with the same arguments
+                    this.inherited(arguments);
+                    console.log("B.m21");
+                    // super call with new arguments
+                    this.inherited(arguments, ["a"]);
+                    console.log("B.m22");
+                    console.log(arguments);
+                }
+            });
+
+            // extend B using lang.extend()
+            lang.extend(B, {
+                m3: function () {
+                    // this method is not annotated =>
+                    // we should supply its name when calling
+                    // a superclass:
+                    // simple super call with the same arguments
+                    this.inherited("m3", arguments);
+                    console.log("B.m31");
+                    // super call with new arguments
+                    this.inherited("m3", arguments, ["a"]);
+                    console.log("B.m32");
+                    console.log(arguments);
+                }
+            });
+
+            // let's create an instance
+            var x = new B();
+            x.m1();  
+            // A.m1   arguments[]  => length:0
+            // B.m11 
+            // A.m1  arguments(3)[1,2,3]
+            // B.m12 arguments[]  => length:0
+
+            x.m2();  
+            // A.m2   arguments[]  => length:0
+            // B.m21 
+            // A.m2  arguments["a"]
+            // B.m22 arguments[]  => length:0
+
+            x.m3();   //输出同上
+            x.m4(); // A.m4()   arguments[]  => length:0
+            x.m5(); // 输出同上
+            //综上，经过测试发现，只要用到inherited()方法，就会先调用父函数，再运行现在的函数
+            //若没有用到inherited()方法，则还是按父函数中的方法运行
+            //同时通过参数数组为原函数的arguments增加参数
+            //extend和lang.extend用法相同
+
+
+
+            // add a method on the fly using declare.safeMixin()
+            declare.safeMixin(x, {
+                m4: function () {
+                    // this method is going to be properly annotated =>
+                    // we can use the same form of this.inherited() as
+                    // normal methods:
+                    // simple super call with the same arguments
+                    this.inherited(arguments);
+                    console.log("x.m41");
+                    // super call with new arguments
+                    this.inherited(arguments, ["a"]);
+                    console.log("x.m42");
+                }
+            });
+
+            // add a method on the fly
+            x.m5 = function () {
+                // this method is not annotated =>
+                // we should supply its name when calling
+                // a superclass:
+                // simple super call with the same arguments
+                this.inherited("m5", arguments);
+                console.log("x.m51");
+                // super call with new arguments
+                this.inherited("m5", arguments, ["a"]);
+                console.log("x.m52");
+            };
+
+            x.m4(); 
+            //A.m4   Arguments [callee: ƒ, Symbol(Symbol.iterator): ƒ]
+            //x.m41
+            //A.m4    Arguments ["a", callee: ƒ, Symbol(Symbol.iterator): ƒ]
+            //x.m42
+            x.m5(); // 输出同上
+            //说明：用safeMixin和直接对函数的某一性质改变值后结果一样
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

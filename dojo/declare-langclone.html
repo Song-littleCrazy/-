@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require(["dojo/_base/declare", "dojo/_base/lang"], function (declare, lang) {
+            //lang.mixin函数执行"浅拷贝" ，基本类型原数据不受影响，object会改变
+            //lang.clone执行"深拷贝",拷贝前后的两个对象互不影响
+            var a = {
+                name: "a",
+                subObject: {
+                    foo: "bar"
+                }
+            };
+            var b = lang.mixin({}, a);
+
+            b.name = "b";
+            b.subObject.foo = "baz";
+
+            console.log("a b, as expected:",
+                a.name, b.name);  //a b
+            console.log("true - both subObjects reference the exact same object:",
+                a.subObject === b.subObject);  //true
+            console.log("baz baz - a change to one subObject affects both:",
+                a.subObject.foo, b.subObject.foo);  //baz baz
+
+            var a = {
+                name: "a",
+                subObject: {
+                    foo: "bar"
+                }
+            };
+            var b = lang.clone(a);
+
+            b.name = "b";
+            b.subObject.foo = "baz";
+
+            console.log("a b, same as before:",
+                a.name, b.name);   //a b
+            console.log("false - the subObjects are different now:",
+                a.subObject === b.subObject);  //false
+            console.log("bar baz - a change to one subObject no longer affects all:",
+                a.subObject.foo, b.subObject.foo);  //bar baz
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

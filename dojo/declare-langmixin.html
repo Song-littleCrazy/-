@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require(["dojo/_base/declare","dojo/_base/lang"], function (declare,lang) {
+            var defaultSettings = {
+                useTheForce: true,
+                isEvil: false,
+                length: 75,
+                color: "blue"
+            };
+            function Light(settings){
+                this.settings = lang.mixin({},defaultSettings,settings);
+            }
+
+            var darthsaber = new Light({
+                isEvil: true,
+                color: "red"
+            });
+
+            console.log(darthsaber.settings);//{useTheForce: true, isEvil: true, length: 75, color: "red"}
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

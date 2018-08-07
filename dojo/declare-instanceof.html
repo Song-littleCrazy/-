@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require(["dojo/_base/declare"], function (declare) {
+            var A = declare(null);
+            var B = declare(null);
+            var C = declare(null);
+
+            var D = declare([A,B]);
+
+            var x = new D();
+
+            console.log(x instanceof A);  //true
+            console.log(x.isInstanceOf(A));  //true
+
+            console.log(x instanceof B);  //false
+            console.log(x.isInstanceOf(B));  //true
+            
+            console.log(x instanceof C);  //false
+            console.log(x.isInstanceOf(C));  //false
+            
+            console.log(x instanceof D);  //true
+            console.log(x.isInstanceOf(D));  //true
+
+            //注意写法
+            //instanceof测试是否在构造函数的prototype性质出现在对象的原型链中的任何地方
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

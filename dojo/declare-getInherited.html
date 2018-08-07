@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require(["dojo/_base/declare"], function (declare) {
+            var A = declare(null, {
+                m1: function () {
+                    // ...
+                },
+                m2: function () {
+                    // ...
+                }
+            });
+
+            var B = declare(A, {
+                logAndCall: function (name, method, args) {
+                    console.log("Calling " + name + "...");
+                    method.apply(this, args);
+                    console.log("...done");
+                },
+                m1: function () {
+                    var supermethod = this.getInherited(arguments);
+                    this.logAndCall("A.m1", supermethod, [1, 2]);
+                }
+            });
+
+            var x = new B();
+            x.m2 = function () {
+                // we need to use a name here because
+                // this method was not properly annotated:
+                var supermethod = this.getInherited("m2", arguments);
+                this.logAndCall("A.m2", supermethod, [1, 2]);
+            };
+
+            x.m1();
+            //Calling A.m1...
+            //...done
+            
+            x.m2();  
+            //Calling A.m2...
+            //...
+
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

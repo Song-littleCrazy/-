@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        //
+        require(["dojo/_base/declare"], function (declare) {
+            var A = declare(null,{
+                m1: function(){console.log("A.m1")},
+                s1: "bar"
+            });
+            var B = declare(null,{
+                m2: function(){console.log("B.m1")},
+                s2: "foo"
+            });
+            var C = declare(null,{});
+
+            //两种方法引用
+            var D1 = A.createSubclass([B,C],{
+                m1: function(){console.log("D1.m1")},
+                d1: 42
+            });
+            var d1 = new D1();
+            d1.m1();  //D1.m1
+            d1.m2();  //B.m1
+            console.log(d1.d1,d1.s1,d1.s2);  //42 "bar" "foo"
+
+
+            //等价于
+            var D2 = declare([A,B,C],{
+                m1: function(){console.log("D2.m1")},
+                d1: 42
+            });
+            var d2 = new D2();
+            d2.m1();  //D2.m1
+            d2.m2();  //B.m1
+            console.log(d2.d1,d2.s1,d2.s2);  //42 "bar" "foo"
+
+
+        });
+
+
+
+    </script>
+</body>
+
+</html>

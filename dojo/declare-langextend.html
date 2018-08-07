@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+
+    <h1>Demo: lang.extend</h1>
+    <p>Hit button! The result is in the console.</p>
+
+    <button id="btn" data-dojo-type="dijit/form/Button">Swing</button>
+
+
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        require([
+            "dojo/parser",
+            "dojo/_base/lang",
+            "dijit/registry",
+            "dijit/form/Button"
+        ], function (parser, lang, registry) {
+            
+			parser.parse();
+
+            var defaultSettings = {
+                useTheForce: true,
+                isEvil: false,
+                length: 75,
+                color: "blue"
+            };
+            function Lightsaber(settings) {
+                this.settings = lang.mixin({}, defaultSettings, settings);
+            }
+
+            var darthsaber = new Lightsaber({
+                isEvil: true,
+                color: "red"
+            });
+
+            var weaponMixin = {
+                hp: 5,
+                maxHp: 10,
+                repair: function () {
+                    if (this.hp >= this.maxHp) {
+                        console.log("Can't repair!");
+                        return;
+                    }
+
+                    this.hp++;
+                },
+                swing: function () {
+                    if (!this.hp) {
+                        console.log("Weapon is broken!");
+                        return;
+                    }
+
+                    this.hp--;
+                    console.log(Math.random() >= 0.5 ? "hit!" : "miss!");
+                }
+            };
+
+            lang.extend(Lightsaber, weaponMixin);
+
+            // Now we can call swing() on our Lightsaber instance,
+            // even though we augmented the prototype after creating the instance.
+            darthsaber.swing(); // "hit!" (or "miss!" if you are unlucky)
+
+            
+
+				registry.byId('btn').on('click', lang.hitch(darthsaber, 'swing'));
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

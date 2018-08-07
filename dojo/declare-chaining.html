@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dojo-declare!</title>
+</head>
+
+<body>
+    <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+    <script>
+        //链接chain方法有两种方式：after和before。
+        //after表示在超类'方法之后调用方法。
+        //before表示在调用其超类方法之前调用方法。
+        //所有链都在一个名为的特殊属性中描述-chains-：
+        require(["dojo/_base/declare", "dojo/dom-construct", "dojo/_base/window"],
+            function (declare, domConst, win) {
+                var A = declare(null, {
+                    "-chains-": {
+                        init: "after",
+                        destroy: "before"
+                    },
+
+                    init: function (token) {
+                        this.initialized = true;
+                        this.token = token;
+                        this.node = domConst.create("div", null, win.body());
+                        console.log("A.init");
+                    },
+
+                    destroy: function () {
+                        domConst.destroy(this.node);
+                        this.node = null;
+                        console.log("A.destroy");
+                    }
+                });
+
+                var B = declare(A, {
+                    init: function (token) {
+                        console.log("B.init");
+                        // more code
+                    },
+
+                    destroy: function () {
+                        console.log("B.destroy");
+                        // more code
+                    }
+                });
+
+                var C = declare(B, {
+                    init: function (token) {
+                        console.log("C.init");
+                        // more code
+                    },
+
+                    destroy: function () {
+                        console.log("C.destroy");
+                        // more code
+                    }
+                });
+
+                var x = new C();
+                x.init(42);
+                x.destroy();
+            });
+            //A.init
+            // B.init
+            // C.init
+            // C.destroy
+            // B.destroy
+            // A.destroy
+
+
+    </script>
+</body>
+
+</html>

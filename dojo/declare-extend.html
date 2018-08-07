@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dojo-declare!</title>
+</head>
+
+<body>
+  <script src="dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="async: true"></script>
+
+  <script>
+    //
+    require(["dojo/_base/declare"], function (declare) {
+      var A = declare(null, {
+        m1: function () { console.log("A org"); },
+        m2: function () { console.log("A org"); }
+      });
+
+      var B = declare(null, {
+        m2: function () { this.inherited(arguments); console.log("B org"); },
+        m3: function () { this.inherited(arguments); console.log("B org"); }
+      });
+
+      var C = declare(null, {
+        m3: function () { this.inherited(arguments); console.log("C org"); },
+        m4: function () { this.inherited(arguments); console.log("C org"); }
+      });
+
+      var ABC = declare([A, B, C], {});
+
+      // now A is the true base, B and C are mixed in
+
+      var abc = new ABC();
+
+      abc instanceof A; // true
+      abc instanceof B; // false
+      abc instanceof C; // false
+
+      // use isInstanceOf() to check if you include
+      // proper mixins
+
+      // let's list top methods:
+      // m1 comes from A (inherited)
+      // m2 comes from B (copied)
+      // m3 comes from C (copied)
+      // m4 comes from D (copied)
+
+      abc.m1(); // A org
+      abc.m2(); // A org, B org
+      abc.m3(); // B org, C org
+      abc.m4(); // C org
+
+      // let's extend() all prototypes
+
+      A.extend({
+        m1: function () { console.log("A new"); },
+        m2: function () { console.log("A new"); }
+      });
+
+      B.extend({
+        m2: function () { this.inherited(arguments); console.log("B new"); },
+        m3: function () { this.inherited(arguments); console.log("B new"); }
+      });
+
+      C.extend({
+        m3: function () { this.inherited(arguments); console.log("C new"); },
+        m4: function () { this.inherited(arguments); console.log("C new"); }
+      });
+
+      // observe that top copied methods are not changed
+
+      abc.m1(); // A new
+      abc.m2(); // A new, B org
+      abc.m3(); // B new, C org
+      abc.m4(); // C org
+    });
+
+
+
+  </script>
+</body>
+
+</html>
