@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>templated-demo</title>
+    <link rel="stylesheet" href="./demo.css" media="screen" type="text/css">
+
+</head>
+
+<body>
+    <h1>Demo: Using _TemplatesMixin</h1>
+    <div>
+        <div data-dojo-type="demo/SomeWidget" data-dojo-props="title: 'Our Some Widget'">Don't forget to click on the title!</div>
+        <p>This is arbitrary content!</p>
+        <button data-dojo-type="dijit/form/Button">My button</button>
+        <p>More arbitrary content!</p>
+    </div>
+
+    <script>
+        //通过设置dojoBlankHtmlUrl 属性使Dojo访问dojo/resources/blank.html 的本地副本文件，从而确保模块（如dojo/hash）开启跨域功能
+        var dojoConfig = {
+            async: true,
+            dojoBlankHtmlUrl: location.pathname.replace(/\/[^/]+$/, "") + "/black.html",
+            packages: [{
+                name: "demo",
+                location: location.pathname.replace(/\/[^/]+$/, "") + "/"
+            }]
+        };
+    </script>
+
+    <script src="../dojo-release-1.13.0/dojo/dojo.js" data-dojo-config="isDebug: 1,async: 1,parseOnload: 1"></script>
+
+    <script>
+        require([
+            "dojo/parser",
+            "demo/SomeWidget",
+            "dijit/form/Button"
+        ], function (parser) {
+            parser.parse();
+        })
+    </script>
+</body>
+
+</html>
