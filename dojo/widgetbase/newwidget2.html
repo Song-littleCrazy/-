@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Widget</title>
+</head>
+
+<body>
+    <!--把span去掉，用widget写此处的代码-->
+    <script>
+        dojoConfig = {
+            parseOnload: false
+        }
+    </script>
+    <script src="../dojo-release-1.13.0/dojo/dojo.js"></script>
+    <script>
+        require([
+            "dojo/_base/declare",
+            "dojo/ready",
+            "dojo/dom-construct",
+            "dojo/_base/window",
+            "dijit/_WidgetBase"
+        ], function (declare, ready, domConstruct, win, _WidgetBase) {
+            declare("MyFirstWidget", [_WidgetBase], {
+                buildRendering: function () {
+                    //添加代码
+                    // create the DOM for this widget
+                    this.domNode = domConstruct.create("button", { innerHTML: "push me" });
+                }
+            });
+
+            ready(function () {
+                //parser.parse();
+                // Create the widget programmatically and place in DOM
+                (new MyFirstWidget()).placeAt(win.body());
+            });
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Widget</title>
+</head>
+<body>
+    <span data-dojo-type="MyFirstWidget" >hi</span>
+    <script>
+        dojoConfig = {
+            parseOnload: false
+        }
+    </script>
+    <script src="../dojo-release-1.13.0/dojo/dojo.js"></script>
+    <script>
+        require([
+            "dojo/_base/declare",
+            "dojo/parser",
+            "dojo/ready",
+            "dijit/_WidgetBase"
+            ],function(declare,parser,ready,_WidgetBase){
+                declare("MyFirstWidget",[_WidgetBase],{
+
+                });
+                ready(function(){
+                    //用来解析组件
+                    parser.parse();
+                })
+            })
+    </script>
+</body>
+</html>
