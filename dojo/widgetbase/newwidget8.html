@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Widget</title>
+</head>
+<body>
+    <button data-dojo-type="MyFirstWidget" >hi</button>
+
+    <script>
+        dojoConfig = {
+            parseOnload: false
+        }
+    </script>
+    <script src="../dojo-release-1.13.0/dojo/dojo.js"></script>
+    <script>
+        require([
+            "dojo/_base/declare",
+            "dojo/ready",
+            "dojo/parser",
+            "dijit/_WidgetBase",
+            "dijit/_TemplatedMixin" 
+        ], function (declare, ready, parser, _WidgetBase, _TemplatedMixin) {
+                declare("MyFirstWidget",[_WidgetBase,_TemplatedMixin],{
+                    //通过把button的data-dojo-attach-point设置为'containerNode'，从而使模板自动处理
+                    templateString: "<button data-dojo-attach-point='containerNode'></button>"
+                });
+                ready(function(){
+                    //用来解析组件
+                    parser.parse();
+                })
+            })
+    </script>
+</body>
+</html>
+

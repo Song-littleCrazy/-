@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Widget</title>
+</head>
+
+<body>
+    <!--重新定义span-->
+    <span data-dojo-type="MyFirstWidget"></span>
+    <p data-dojo-type="MyFirstWidget"></p>
+    <!--说明：只要data-dojo-type="MyFirstWidget就可以，标签无所谓，是否包含内容也无所谓"-->
+
+    <script>
+        dojoConfig = {
+            parseOnload: false
+        }
+    </script>
+    <script src="../dojo-release-1.13.0/dojo/dojo.js"></script>
+    <script>
+        require([
+            "dojo/_base/declare",
+            "dojo/ready",
+            "dojo/dom-construct",
+            "dojo/parser",
+            "dojo/_base/window",
+            "dijit/_WidgetBase",
+            "dijit/_TemplatedMixin"   //添加templatedMixin
+        ], function (declare, ready, domConstruct, parser, win, _WidgetBase,_TemplatedMixin) {
+            declare("MyFirstWidget", [_WidgetBase,_TemplatedMixin], {
+                //先设定一个计数器
+                _i:0,
+
+                templateString: "<div>"+
+                    "<button data-dojo-attach-event='onclick: increment'>press me</button>"+
+                    "&nbsp; count: <span data-dojo-attach-point='counter'>0</span>"+
+                    "<div>",
+
+                // buildRendering: function () {
+                //     //添加代码
+                //     // create the DOM for this widget
+                //     this.domNode = domConstruct.create("button", { innerHTML: "push me" });
+                // },
+                // //添加代码
+                // postCreate: function () {
+                //     // every time the user clicks the button, increment the counter
+                //     this.connect(this.domNode, "onclick", "increment");
+                // },
+
+                //对应上面的increment函数
+                increment: function () {
+                    //this.domNode.innerHTML = ++this._i;
+
+                    //对应templateString中的span标签中的counter
+                    this.counter.innerHTML = ++this._i;
+                }
+            });
+
+            ready(function () {
+                // Call the parser manually so it runs after our widget is defined, and page has finished loading
+                parser.parse();
+                // Create the widget programmatically and place in DOM
+                //(new MyFirstWidget()).placeAt(win.body());
+
+            });
+        })
+    </script>
+</body>
+
+</html>
