@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Create web map from id</title>
+
+  <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/esri/css/esri.css">
+  <style>
+    html,body,#mapDiv,.map.container {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+    }
+    #legendDiv{
+      background-color: #fff;
+      position: absolute !important;
+      z-index: 99;
+      top: 10px;
+      right: 20px;
+    }
+  </style>
+  
+  <script var dojoConfig = { parseOnload:true; }></script>
+  <script src="http://localhost:8080/arcgis_js_api/library/3.24/3.24/dojo/dojo.js"></script>
+  <script src="http://localhost:8080/arcgis_js_api/library/3.24/3.24/"></script>
+  <script>
+    var map;
+    require([
+      "esri/map",
+      "esri/arcgis/utils",
+      "esri/dijit/Legend",
+      "dojo/domReady!"
+      ],function(Map,arcgisUtils,Legend){
+        //有反应，需要输入1a40fa5cc1ab4569b79f45444d728067项目的用户名和密码
+        arcgisUtils.createMap("1a40fa5cc1ab4569b79f45444d728067","mapDiv").then(function(response){
+          map = response.map;
+
+          var legend = new Legend({
+            map: map,
+            layerInfos: (arcgisUtils.getLegendLayers(response))
+          },"legendDiv");
+
+          legend.startup();
+        });
+    })
+  </script>
+</head>
+
+<body>
+  <div id="mapDiv"></div>
+  <div id="legendDiv"></div>
+</body>
+
+</html>
