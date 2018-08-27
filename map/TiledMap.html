@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/esri/css/esri.css">
+    <title>DoubleMap</title>
+    <style>
+
+        html,body,#map {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script>var dojoConfig = {parseOnLoad: true, async: true};</script>
+    <script src="http://localhost:8080/arcgis_js_api/library/3.24/3.24/init.js"></script>
+    <script>
+        require([
+                "esri/map",
+                "esri/layers/ArcGISTiledMapServiceLayer",
+                "esri/layers/ArcGISDynamicMapServiceLayer",
+                "dojo/domReady!"
+            ],
+            function (Map, ArcGISTiledMapServiceLayer,ArcGISDynamicMapServiceLayer) {
+                var map = new Map("map");
+                var FirstLayer = new ArcGISTiledMapServiceLayer("http://172.16.45.70/arcgis/rest/services/%E6%94%BF%E5%8A%A1%E7%94%B5%E5%AD%90%E5%9C%B0%E5%9B%BE/MapServer");
+                var SecondLayer = new ArcGISDynamicMapServiceLayer("http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer");
+                map.addLayer(FirstLayer);
+                map.addLayer(SecondLayer);
+            });
+    </script>
+</body>
+
+</html>
