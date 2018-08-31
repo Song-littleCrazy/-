@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/esri/css/esri.css">
+    <title>DoubleMap</title>
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map">
+    </div>
+
+    <script>
+        var dojoConfig = {
+            parseOnLoad: true,
+            async: true
+        };
+    </script>
+    <script src="http://localhost:8080/arcgis_js_api/library/3.24/3.24/init.js"></script>
+    <script>
+        require([
+                "esri/map",
+                "esri/geometry/Extent",
+                "esri/layers/ArcGISTiledMapServiceLayer",
+                "esri/layers/ArcGISDynamicMapServiceLayer",
+                "esri/layers/FeatureLayer",
+                "esri/InfoTemplate",
+                "esri/symbols/SimpleFillSymbol",
+                "esri/symbols/SimpleLineSymbol",
+                "esri/symbols/SimpleMarkerSymbol",
+                "esri/renderers/UniqueValueRenderer",
+                "esri/renderers/ClassBreaksRenderer",
+                "esri/renderers/SimpleRenderer",
+                "dojo/colors",
+                "dojo/domReady!"
+            ],
+            function (Map, Extent, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, FeatureLayer,InfoTemplate, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol,
+                UniqueValueRenderer, ClassBreakRenderer, SimpleRenderer, Color) {
+
+                var startExtent = new Extent({
+                    "xmin": 6221,
+                    "ymin": -33700,
+                    "xmax": 118675,
+                    "ymax": 118721,
+                    "spatialReference": {
+                        "wkid": 2435
+                    }
+                });
+                var map = new Map("map", {
+                    extent: startExtent
+                });
+
+                //加载底层的切片地图
+                var FirstLayer = new ArcGISTiledMapServiceLayer(
+                    "http://172.16.45.70/arcgis/rest/services/%E6%94%BF%E5%8A%A1%E7%94%B5%E5%AD%90%E5%9C%B0%E5%9B%BE/MapServer"
+                );
+                map.addLayer(FirstLayer);
+
+                //加载动态图层
+                //var SecondLayer = new ArcGISDynamicMapServiceLayer("http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer");
+                //map.addLayer(SecondLayer);
+
+                //通过InfoTemplate显示气泡窗，并在FeatureLayer中加载出来
+                //var InfoTemplate = new InfoTemplate("Attributes", "${*}");
+                var InfoTemplate = new InfoTemplate("${SNAME}", "所在区：${DISTNAME}");
+
+                //通过FeatureLayer要素图层对其进行划分，在动态图层后+ /0 或 /1 或 /2
+                var FeatureLayer = new FeatureLayer(
+                    "http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer/1", {
+                        mode: FeatureLayer.MODE_ONDEMAND,
+                        infoTemplate: InfoTemplate,
+                        outFields: ["*"]
+                    });
+                FeatureLayer.isVisible = true;
+
+                //渲染，唯一渲染、分级渲染和简单渲染只能显示一个，FeatureLayer.setRenderer(renderer)此句在最后，便显示相应的渲染
+                var fillsymbol = new SimpleFillSymbol(
+                    SimpleFillSymbol.SYTLE_SOLID,
+                    new SimpleLineSymbol(
+                        SimpleLineSymbol.STYLE_DASHDOT,
+                        new Color([255, 0, 0]), 2
+                    ),
+                    new Color([255, 255, 0, 0.25])
+                );
+                //唯一值渲染
+                var renderer = new UniqueValueRenderer(fillsymbol, "SNAME");
+                renderer.addValue("小谷围街", new SimpleFillSymbol().setColor(new Color([255, 0, 0, 0.75])));
+                FeatureLayer.setRenderer(renderer);
+
+                //分级渲染
+                var renderer2 = new ClassBreakRenderer(fillsymbol, "OBJECTID");
+                renderer2.addBreak(11, 20, new SimpleFillSymbol().setColor(new Color([0, 255, 0, 0.5])));
+                FeatureLayer.setRenderer(renderer2);
+
+                //简单渲染
+                var SimpleSymbol = new SimpleMarkerSymbol(
+                    SimpleMarkerSymbol.STYLE_CROSS,
+                    12,
+                    new SimpleLineSymbol(
+                        SimpleLineSymbol.SYTLE_SOLID,
+                        new Color([255, 0, 0]),
+                        2
+                    ),
+                    new Color([0, 255, 0, 0, 0.25])
+                );
+                var renderer3 = new SimpleRenderer(SimpleSymbol);
+                FeatureLayer.setRenderer(renderer3);
+
+                map.addLayer(FeatureLayer);
+
+
+
+            });
+    </script>
+</body>
+
+</html>
