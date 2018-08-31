@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/esri/css/esri.css">
+    <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/dijit/themes/claro/claro.css">
     <title>DoubleMap</title>
     <style>
-
-        html,body,#map {
+        html,
+        body,
+        #map {
             height: 100%;
             width: 100%;
             padding: 0;
@@ -19,24 +21,178 @@
 </head>
 
 <body>
+    <div>查询：
+        <input type="text" id="txtName">
+        <button id="sqlque">确定</button>
+    </div>
+    <div id="divShowResult" style="display:none;width:200px;height:200px"></div>
     <div id="map"></div>
 
-    <script>var dojoConfig = {parseOnLoad: true, async: true};</script>
+    <script>
+        var dojoConfig = {
+            parseOnLoad: true,
+            async: true
+        };
+    </script>
     <script src="http://localhost:8080/arcgis_js_api/library/3.24/3.24/init.js"></script>
     <script>
         require([
                 "esri/map",
+                "esri/geometry/Extent",
                 "esri/layers/ArcGISTiledMapServiceLayer",
                 "esri/layers/ArcGISDynamicMapServiceLayer",
+                "esri/layers/FeatureLayer",
+                "esri/dijit/FeatureTable",
+                "esri/symbols/TextSymbol",
+                "esri/symbols/Font",
+                "esri/InfoTemplate",
+                "esri/graphic",
+                "dojo/aspect",
+                "dojo/dom",
+                "dojo/on",
+                "dojo/colors",
                 "dojo/domReady!"
             ],
-            function (Map, ArcGISTiledMapServiceLayer,ArcGISDynamicMapServiceLayer) {
-                var map = new Map("map");
-                var FirstLayer = new ArcGISTiledMapServiceLayer("http://172.16.45.70/arcgis/rest/services/%E6%94%BF%E5%8A%A1%E7%94%B5%E5%AD%90%E5%9C%B0%E5%9B%BE/MapServer");
-                var SecondLayer = new ArcGISDynamicMapServiceLayer("http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer");
+            function (Map, Extent, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, FeatureLayer,
+                FeatureTable, TextSymbol, Font, InfoTemplate, Graphic, aspect, dom, on, Color) {
+
+                var startExtent = new Extent({
+                    "xmin": 6221,
+                    "ymin": -33700,
+                    "xmax": 118675,
+                    "ymax": 118721,
+                    "spatialReference": {
+                        "wkid": 2435
+                    }
+                });
+                var map = new Map("map", {
+                    extent: startExtent
+                });
+
+                //显示当前的xy最大最小值
+                on(map, 'extent-change', function (e) {
+                    console.log(e.extent);
+                });
+
+                //加载底层的切片地图
+                var FirstLayer = new ArcGISTiledMapServiceLayer(
+                    "http://172.16.45.70/arcgis/rest/services/%E6%94%BF%E5%8A%A1%E7%94%B5%E5%AD%90%E5%9C%B0%E5%9B%BE/MapServer"
+                );
                 map.addLayer(FirstLayer);
-                map.addLayer(SecondLayer);
-            });
+
+                //加载动态图层
+                //var SecondLayer = new ArcGISDynamicMapServiceLayer("http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer");
+                //map.addLayer(SecondLayer);
+
+                //通过InfoTemplate显示气泡窗，并在myFeatureLayer中加载出来
+                //var InfoTemplate = new InfoTemplate("Attributes", "${*}");
+                var InfoTemplate = new InfoTemplate("${SNAME}", "所在区：${DISTNAME}");
+
+                //通过FeatureLayer要素图层对其进行划分，在动态图层后+ /0 或 /1 或 /2
+                var myFeatureLayer = new FeatureLayer(
+                    "http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer/1", {
+                        mode: FeatureLayer.MODE_ONDEMAND,
+                        infoTemplate: InfoTemplate,
+                        outFields: ["*"]
+                    });
+                myFeatureLayer.isVisible = true;
+
+                map.addLayer(myFeatureLayer);
+
+                //定义要素表格
+                // var FeatureTable = new FeatureTable({
+                //     featureLayer: myFeatureLayer,
+                //     map: map,
+                //     editable: true,
+                //     syncSelection: true,
+                //     showRelatedRecords: true,
+                //     showAttachments: true,
+                //     outFields: ["OBJECTID", "SNAME", "DISTNAME", "SHAPE_Length", "SHAPE_Area"]
+                // }, myTableNode)
+                //首先表格运行，不能放在点击函数里面，只需要refresh()在点击函数里。
+                // FeatureTable.startup(); 
+
+                myFeatureLayer.setDefinitionExpression("sname like ''");
+                on(dom.byId("sqlque"), "click", function () {
+                    var queryName = dom.byId("txtName").value;
+                    if (queryName == "") {
+                        return;
+                    }
+                    var whereStr = " sname like '%" + queryName + "%'";
+                    myFeatureLayer.setDefinitionExpression(whereStr);
+                    console.log(myFeatureLayer.graphics);
+
+                    // on(map, "onLoad", function () {
+                    //     var resizeTimer = setTimeout(function () {
+                    //         map.resize();
+                    //         map.reposition();
+                    //         console.log("big");
+                    //     }, 500);
+                    //     clearTimeout(resizeTimer);
+                    // });
+
+                
+                    //dojo.connect可以用dojo/on或dojo/aspect::after替代，on是连接到dom事件，after则是常规的JS对象和函数
+                    aspect.after(myFeatureLayer, "onUpdateEnd", function (error) {
+                        if (myFeatureLayer.graphics.length > 0) {
+                            console.log(myFeatureLayer.graphics.length);
+                            map.graphics.clear();
+
+                            document.getElementById("divShowResult").style.display = "block";
+                            var htmls = "<p>查询结果</p>";
+                            htmls += "";
+                            htmls = htmls + "<table border='1'>";
+                            htmls = htmls + "<tr>";
+                            htmls = htmls + "<td>" + "名字" + "</td>";
+                            htmls = htmls + "<td>" + "所在区" + "</td>";
+                            htmls = htmls + "</tr>";
+                            for (var i = 0; i < myFeatureLayer.graphics.length; i++) {
+                                var graphic = myFeatureLayer.graphics[i];
+                                var geometry = graphic.geometry;
+                                var PoiName = graphic.attributes["SNAME"];
+                                var DistName = graphic.attributes["DISTNAME"];
+
+
+                                if (i % 2 == 0)
+                                    htmls = htmls + "<tr bgcolor='#F0F0F0'>";
+                                else
+                                    htmls = htmls + "<tr>";
+                                htmls = htmls + "<td>" + PoiName + "</td>";
+                                htmls = htmls + "<td>" + DistName + "</td>";
+                                htmls = htmls + "</tr>";
+
+                                //在图层上添加文本
+                                var textSymbol = new TextSymbol(PoiName);
+                                textSymbol.setColor(new Color([128, 0, 0]));
+                                //设置字体
+                                var font = new Font();
+                                font.setSize("10pt");
+                                font.setFamily("微软雅黑")
+                                textSymbol.setFont(font);
+                                //设置文本x和y的偏移量
+                                textSymbol.setOffset(0, 10);
+
+                                //graphic.toJson()把graphic转换成json类型
+                                var graphicText = Graphic(graphic.toJson());
+                                //设置图形的符号
+                                graphicText.setSymbol(textSymbol);
+                                map.graphics.add(graphicText);
+
+                            }
+                            htmls = htmls + "</table>";
+
+                            document.getElementById("divShowResult").style.overflow = "scroll";
+                            document.getElementById("divShowResult").innerHTML = htmls;
+
+                            //map.setExtent(geometry.getExtent().expand(3));
+
+                        } else {
+                            document.getElementById("divShowResult").innerHTML = "";
+                        }
+                    })
+                });
+
+            })
     </script>
 </body>
 
