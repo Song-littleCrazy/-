@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/esri/css/esri.css">
+    <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/dijit/themes/claro/claro.css">
+    <title>DoubleMap</title>
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button id="areaShow">显示市区</button>
+        <button id="streetShow">显示街道</button>
+        <button id="villageShow">显示村镇</button>
+        <button id="hidemap">全部隐藏</button>
+        <button id="showgzhu">显示大学城</button>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        var dojoConfig = {
+            parseOnLoad: true,
+            async: true
+        };
+    </script>
+    <script src="http://localhost:8080/arcgis_js_api/library/3.24/3.24/init.js"></script>
+    <script>
+        require([
+                "esri/map",
+                "esri/geometry/Extent",
+                "esri/layers/ArcGISTiledMapServiceLayer",
+                "esri/layers/ArcGISDynamicMapServiceLayer",
+                "esri/layers/FeatureLayer",
+                "esri/dijit/FeatureTable",
+                "esri/symbols/TextSymbol",
+                "esri/symbols/Font",
+                "esri/InfoTemplate",
+                "esri/graphic",
+                "dojo/aspect",
+                "dojo/dom",
+                "dojo/on",
+                "dojo/colors",
+                "dojo/domReady!"
+            ],
+            function (Map, Extent, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, FeatureLayer,
+                FeatureTable, TextSymbol, Font, InfoTemplate, Graphic, aspect, dom, on, Color) {
+
+                var startExtent = new Extent({
+                    "xmin": 6221,
+                    "ymin": -33700,
+                    "xmax": 118675,
+                    "ymax": 118721,
+                    "spatialReference": {
+                        "wkid": 2435
+                    }
+                });
+                var map = new Map("map", {
+                    extent: startExtent
+                });
+
+                //加载底层的切片地图
+                var FirstLayer = new ArcGISTiledMapServiceLayer(
+                    "http://172.16.45.70/arcgis/rest/services/%E6%94%BF%E5%8A%A1%E7%94%B5%E5%AD%90%E5%9C%B0%E5%9B%BE/MapServer"
+                );
+                map.addLayer(FirstLayer);
+
+                //加载动态图层
+                var SecondLayer = new ArcGISDynamicMapServiceLayer("http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer");
+                
+                //通过setVisibleLayers()方法控制动态地图服务中单个图层的可见性。
+                //接收的参数是数组，根据标号找到相应的信息。不适用于切片地图。
+                var handle1 = on(dom.byId("areaShow"), "click", function () {
+                    SecondLayer.setVisibleLayers([2]);
+                    map.addLayer(SecondLayer);
+                });
+                var handle2 = on(dom.byId("streetShow"), "click", function () {
+                    SecondLayer.setVisibleLayers([1]);
+                    map.addLayer(SecondLayer);
+                });
+                var handle3 = on(dom.byId("villageShow"), "click", function () {
+                    SecondLayer.setVisibleLayers([0]);
+                    map.addLayer(SecondLayer);
+                });
+                on(dom.byId("hidemap"), "click", function () {
+                    SecondLayer.hide();
+                    //remove无效，但是hide隐藏后所有的信息都不会再显示
+                    // handle1.remove();
+                    // handle2.remove();
+                    // handle3.remove();
+                });
+                on(dom.byId("showgzhu"), "click", function () {
+                    var layerDefinitions = [];
+                    //不选村镇和区的信息，但是若先选此项，则后续选中显示市区、街道和村镇都不会显示
+                    layerDefinitions[0] = "OBJECTID<0";
+                    layerDefinitions[2] = "OBJECTID<0";
+                    //根据小谷围街选街道信息，也可以根据对应的编号进行选择
+                    layerDefinitions[1] = "SNAME = '小谷围街'";
+                    SecondLayer.setLayerDefinitions(layerDefinitions);
+                    map.addLayer(SecondLayer);
+                });
+
+                //通过InfoTemplate显示气泡窗，并在myFeatureLayer中加载出来
+                // var InfoTemplate = new InfoTemplate("Attributes", "${*}");
+
+                // var MapLayer =
+                //     "http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer";
+
+
+                // //通过FeatureLayer要素图层对其进行划分，在动态图层后+ /0 或 /1 或 /2
+                // var areaFeatureLayer = new FeatureLayer(
+                //     MapLayer + "/2", {
+                //         mode: FeatureLayer.MODE_ONDEMAND,
+                //         infoTemplate: InfoTemplate,
+                //         outFields: ["*"]
+                //     });
+
+                // var streetFeatureLayer = new FeatureLayer(
+                //     MapLayer + "/1", {
+                //         mode: FeatureLayer.MODE_ONDEMAND,
+                //         infoTemplate: InfoTemplate,
+                //         outFields: ["*"]
+                //     });
+
+                // var villageFeatureLayer = new FeatureLayer(
+                //     MapLayer + "/0", {
+                //         mode: FeatureLayer.MODE_ONDEMAND,
+                //         infoTemplate: InfoTemplate,
+                //         outFields: ["*"]
+                //     });
+
+                // areaFeatureLayer.isVisible = false;
+                // streetFeatureLayer.isVisible = false;
+                // villageFeatureLayer.isVisible = false;
+
+                // on(dom.byId("areaShow"), "click", function () {
+                //     areaFeatureLayer.isVisible = true;
+                //     map.addLayer(areaFeatureLayer);
+                // });
+                // on(dom.byId("streetShow"), "click", function () {
+                //     streetFeatureLayer.isVisible = true;
+                //     map.addLayer(streetFeatureLayer);
+                // });
+                // on(dom.byId("villageShow"), "click", function () {
+                //     villageFeatureLayer.isVisible = true;
+                //     map.addLayer(villageFeatureLayer);
+                // });
+                // on(dom.byId("hidemap"), "click", function () {
+                //     areaFeatureLayer.hide();
+                //     streetFeatureLayer.hide();
+                //     villageFeatureLayer.hide();
+                //     map.addLayers([areaFeatureLayer, streetFeatureLayer, villageFeatureLayer]);
+                // });
+
+
+
+
+            })
+    </script>
+</body>
+
+</html>
