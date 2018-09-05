@@ -27,8 +27,10 @@
         <button id="villageShow">显示村镇</button>
         <button id="hidemap">全部隐藏</button>
         <button id="showgzhu">显示大学城</button>
+        输入查询的街道信息：<input type="text" id="name">
+        <button id="btn">查询</button>
     </div>
-    <div id="map"></div>
+    <div id="map" style="width:900px; height:600px; border:1px solid #000;"></div>
 
     <script>
         var dojoConfig = {
@@ -44,19 +46,24 @@
                 "esri/layers/ArcGISTiledMapServiceLayer",
                 "esri/layers/ArcGISDynamicMapServiceLayer",
                 "esri/layers/FeatureLayer",
-                "esri/dijit/FeatureTable",
                 "esri/symbols/TextSymbol",
+                "esri/symbols/SimpleLineSymbol",
+                "esri/symbols/SimpleFillSymbol",
                 "esri/symbols/Font",
                 "esri/InfoTemplate",
                 "esri/graphic",
-                "dojo/aspect",
+                "esri/tasks/query",
+                "esri/tasks/QueryTask",
+                "esri/tasks/FindTask",
+                "esri/tasks/FindParameters",
                 "dojo/dom",
                 "dojo/on",
                 "dojo/colors",
                 "dojo/domReady!"
             ],
             function (Map, Extent, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, FeatureLayer,
-                FeatureTable, TextSymbol, Font, InfoTemplate, Graphic, aspect, dom, on, Color) {
+                TextSymbol, SimpleLineSymbol, SimpleFillSymbol, Font, InfoTemplate, Graphic, Query, QueryTask,
+                FindTask, FindParameters, dom, on, Color) {
 
                 var startExtent = new Extent({
                     "xmin": 6221,
@@ -78,8 +85,10 @@
                 map.addLayer(FirstLayer);
 
                 //加载动态图层
-                var SecondLayer = new ArcGISDynamicMapServiceLayer("http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer");
-                
+                var SecondLayer = new ArcGISDynamicMapServiceLayer(
+                    "http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer"
+                );
+
                 //通过setVisibleLayers()方法控制动态地图服务中单个图层的可见性。
                 //接收的参数是数组，根据标号找到相应的信息。不适用于切片地图。
                 var handle1 = on(dom.byId("areaShow"), "click", function () {
@@ -101,6 +110,8 @@
                     // handle2.remove();
                     // handle3.remove();
                 });
+
+                //此属性和上面的显示图层，只能出现一个。
                 on(dom.byId("showgzhu"), "click", function () {
                     var layerDefinitions = [];
                     //不选村镇和区的信息，但是若先选此项，则后续选中显示市区、街道和村镇都不会显示
@@ -111,6 +122,99 @@
                     SecondLayer.setLayerDefinitions(layerDefinitions);
                     map.addLayer(SecondLayer);
                 });
+
+
+                //空间查询
+                //点击地图上的点，可以选中并改变颜色
+                map.on("click", mapClick);
+
+                function mapClick(e) {
+                    //获得用户点击的地图坐标
+                    var point = e.mapPoint;
+                    //实例化查询参数
+                    query = new Query;
+                    query.geometry = point;
+                    query.outFields = ["*"];
+                    query.outSpatialReference = map.spatialReference;
+                    query.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
+                    query.returnGeometry = true;
+
+                    //实例化查询对象，选中具体是根据什么查询，0/1/2
+                    var queryTask = new QueryTask(
+                        "http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer/2"
+                    );
+                    //进行查询
+                    queryTask.execute(query, showFindResult);
+                }
+
+                function showFindResult(queryResult) {
+                    if (queryResult.features == 0) {
+                        alert("没有元素");
+                        return;
+                    }
+                    for (var i = 0; i < queryResult.features.length; i++) {
+                        //获得改图形的形状
+                        var feature = queryResult.features[i];
+                        var geometry = feature.geometry;
+                        console.log(geometry);
+
+                        //定义高亮图形的符号
+                        //先定义图形的边界线及颜色
+                        var outline = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT, new Color([255, 0, 0]),
+                            1);
+                        //再定义图形内部填充的颜色
+                        var PolygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, outline, new Color([
+                            0, 255, 255, 0.5
+                        ]));
+                        //创建客户端图形
+                        var graphic = new Graphic(geometry, PolygonSymbol);
+                        map.graphics.add(graphic);
+                    }
+                }
+
+
+                //属性查询
+                on(dom.byId("btn"),"click",function(){
+                    var name = dom.byId("name").value;
+                    console.log(name);
+
+                    var FindParams = new FindParameters();
+                    FindParams.returnGeometry = true;
+                    FindParams.layerIds = [1];
+                    FindParams.searchFields = ["SNAME"];
+                    FindParams.searchText = name;
+
+                    var findTask = new FindTask("http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer");
+                    findTask.execute(FindParams,showResult);
+                });
+
+                function showResult(queryResult) {
+                    if (queryResult.features == 0) {
+                        alert("没有元素");
+                        return;
+                    }
+                    for (var i = 0; i < queryResult.length; i++) {
+                        //获得改图形的形状
+                        var feature = queryResult[i].feature;
+                        var geometry = feature.geometry;
+                        console.log(geometry);
+
+                        //定义高亮图形的符号
+                        //先定义图形的边界线及颜色
+                        var outline = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT, new Color([255, 0, 0]),
+                            1);
+                        //再定义图形内部填充的颜色
+                        var PolygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, outline, new Color([
+                            0, 255, 255, 0.5
+                        ]));
+                        //创建客户端图形
+                        var graphic = new Graphic(geometry, PolygonSymbol);
+                        map.graphics.add(graphic);
+                    }
+                }
+
+
+
 
                 //通过InfoTemplate显示气泡窗，并在myFeatureLayer中加载出来
                 // var InfoTemplate = new InfoTemplate("Attributes", "${*}");
