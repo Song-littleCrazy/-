@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/esri/css/esri.css">
+    <link rel="stylesheet" href="http://localhost:8080/arcgis_js_api/library/3.24/3.24/dijit/themes/claro/claro.css">
+    <title>DoubleMap</title>
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button>绘制点</button>
+        <button>绘制折线</button>
+        <button>绘制面</button>
+        <button>徒手线</button>
+        <button>徒手面</button>
+    </div>
+    <div id="map" style="width:900px; height:600px; border:1px solid #000;"></div>
+
+    <script>
+        var dojoConfig = {
+            parseOnLoad: true,
+            async: true
+        };
+    </script>
+    <script src="http://localhost:8080/arcgis_js_api/library/3.24/3.24/init.js"></script>
+    <script>
+        require([
+                "esri/map",
+                "esri/layers/ArcGISTiledMapServiceLayer",
+                "esri/layers/ArcGISDynamicMapServiceLayer",
+                "esri/symbols/SimpleLineSymbol",
+                "esri/symbols/SimpleFillSymbol",
+                "esri/symbols/SimpleMarkerSymbol",
+                "esri/toolbars/draw",
+                "esri/InfoTemplate",
+                "esri/graphic",
+                "dojo/dom",
+                "dojo/on",
+                "dojo/query",
+                "dojo/colors",
+                "dojo/domReady!"
+            ],
+            function (Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, SimpleLineSymbol, SimpleFillSymbol, SimpleMarkerSymbol,
+                Draw, InfoTemplate, Graphic, dom, on, query, Color) {
+
+                var map = new Map("map");
+
+                //加载底层的切片地图
+                var FirstLayer = new ArcGISTiledMapServiceLayer(
+                    "http://172.16.45.70/arcgis/rest/services/%E6%94%BF%E5%8A%A1%E7%94%B5%E5%AD%90%E5%9C%B0%E5%9B%BE/MapServer"
+                );
+                map.addLayer(FirstLayer);
+
+                //加载动态图层
+                var SecondLayer = new ArcGISDynamicMapServiceLayer(
+                    "http://10.194.148.22:6080/arcgis/rest/services/%E8%A1%8C%E6%94%BF%E7%95%8C%E7%BA%BF/MapServer"
+                );
+                map.addLayer(SecondLayer);
+
+                //创建绘图对象
+                var toolbar = new Draw(map, {
+                    showTooltips: true
+                });
+
+                //给每个button绑定一个事件（激活绘图工具）
+                query("button").on("click",function(event){
+                    var value = this.innerHTML;
+                    switch(value){
+                        case "绘制点":{
+                            toolbar.activate(Draw.POINT,{
+                                showTooltips: true
+                            })
+                            break;
+                        }
+                        case "绘制折线":{
+                            toolbar.activate(Draw.POLYLINE,{
+                                showTooltips:true
+                            })
+                            break;
+                        }
+                        case "绘制面":{
+                            toolbar.activate(Draw.POLYGON,{
+                                showTooltips:true
+                            })
+                            break;
+                        }
+                        case "徒手线":{
+                            toolbar.activate(Draw.FREEHAND_POLYLINE,{
+                                showTooltips: true
+                            })
+                            break;
+                        }
+                        case "徒手面":{
+                            toolbar.activate(Draw.FREEHAND_POLYGON,{
+                                showTooltips: true
+                            })
+                            break;
+                        }
+                    }
+                })
+                
+                //设置点线面的属性
+                var marker = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10, lineSymbol, new Color([255, 0, 0]));
+                var lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color([255, 0, 0]), 3);
+                var fill = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol, new Color([255, 0, 0]));
+
+                //给hi图工具绑定绘图完成事件
+                on(toolbar, "draw-complete", function (result) {
+                    //获得几何形状
+                    var geometry = result.geometry;
+                    //获得形状的类型
+                    var type = geometry.type;
+                    //声明图形对象
+                    var graphic;
+                    //通过集合形状的类型，创建不同的图形
+                    switch (type) {
+                        case "point":
+                            graphic = new Graphic(geometry, marker);
+                            break;
+                        case "polyline":
+                            graphic = new Graphic(geometry, lineSymbol);
+                            break;
+                        case "polygon":
+                            graphic = new Graphic(geometry, fill);
+                            break;
+                    }
+                    map.graphics.add(graphic);
+                    //关掉绘图工具
+                    toolbar.deactivate();
+                });
+
+                
+            })
+    </script>
+</body>
+
+</html>
