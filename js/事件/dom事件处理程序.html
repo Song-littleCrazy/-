@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <p> DOM0事件处理程序：将一个函数赋值给一个事件处理程序</p>
+
+    <!-- 先取得一个要操作的对象的引用 -->
+
+    <input type="button" id="myButton" value="firstButton">
+    <input type="button" id="deleteButton" value="deleteFirstButton">
+    <script>
+        var btn = document.getElementById("myButton");
+        var deletebtn = document.getElementById("deleteButton");
+        
+        btn.onclick = function(){
+            alert("其id为:"+this.id);
+        }
+        deletebtn.onclick = function () {
+            alert("删除事件处理程序,再单击firstButton则不会出现弹窗");
+            btn.onclick = null;
+        }
+    </script>
+    <div></div>
+    <!-- 由于在运行script代码以前不会指定事件处理程序，所以如果这些代码在页面中位于按钮后，就可能在一段时间内没反应 -->
+    <!-- 其事件处理程序的作用域为其所属元素的作用域 -->
+    <!-- 添加多个事件时会被覆盖 -->
+
+
+
+
+    <p> DOM2事件处理程序： 处理指定addEventListener()和删除事件处理程序removeEventListener()</p>
+    <!-- 每个方法都接受三个参数：要处理的事件名，作为事件处理程序的函数和一个布尔值（true——捕获阶段调用；false——冒泡阶段调用） -->
+
+    <input type="button" id="secondButton" value="secondButton">
+    <input type="button" id="deleteSecondButton" value="deleteSecondButton">
+    <script>
+        var btn2 = document.getElementById("secondButton");
+        var deletebtn2 = document.getElementById("deleteSecondButton");
+
+        var handler = function () {
+            alert(this.id);
+        }
+        btn2.addEventListener("click", handler, false);
+        btn2.addEventListener("click", function () {
+            alert("又添加了一个事件，且和上一个互不影响");
+        }, false);
+
+
+        deletebtn2.addEventListener("click", function () {
+            alert("删除事件处理程序");
+            btn2.removeEventListener("click", handler, false);
+        })
+    </script>
+    <div></div>
+    <!-- 注意：1、addEventListener可以添加多个事件，且和上一个事件不影响。
+        2、在删除事件处理程序时，只有当添加和删除有一样的参数（见上面的handler函数）才会被删除——哪怕匿名函数一模一样也不会被删除，其他不影响。
+        3、大多数情况，都是将事件处理程序添加到事件流的冒泡阶段，这样可以最大限度地兼容各个浏览器。
+    -->
+
+    <p>只有在事件处理程序执行期间，event对象才会存在；一旦事件处理程序结束，event事件就会被销毁。</p>
+
+    <ul>
+        <li>在需要通过一个函数处理多个事件时，可以使用event.type</li>
+    <input type="button" id="myBtn" value="myBtn">
+    <script>
+        var btn = document.getElementById("myBtn");
+        var handler = function(event){
+            switch(event.type){
+                case "click":
+                    alert("Clicked");
+                    break;
+                case "mouseover":
+                    event.target.style.background = "red";
+                    break;
+                case "mouseout":
+                    event.target.style.background = "";
+                    break;
+            }
+        };
+        btn.onmouseover = handler;
+        btn.onmouseout = handler;
+        btn.onclick = handler;
+    </script>
+
+    <li>阻止默认事件时，用event.preventDefault()方法（只有在cancelable为true时，此方法有效）</li>
+    <a href="http://www.baidu.com">百度</a>
+    <a id="mylink" href="http://www.baidu.com">被阻止的 百度 链接</a>
+    <script>
+        var link = document.getElementById("mylink");
+        link.onclick = function(event){
+            event.preventDefault();
+        }
+    </script>
+    <div></div>
+
+    <li>event.stopPropagation()方法用于立即停止事件在DOM层次中的传播，即取消进一步的事件冒泡或捕获。</li>
+    <div id="interest">
+        <input type="button" id="thirdButton1" value="thirdButton1">
+        <input type="button" id="thirdButton2" value="thirdButton2">
+    </div>
+    <script>
+        var btn31 = document.getElementById("thirdButton1");
+        var btn32 = document.getElementById("thirdButton2");
+        var div = document.getElementById("interest");
+        btn31.onclick = function(event){
+            alert("阻止传播");
+            event.stopPropagation();
+            //只有一个阻止传播的弹窗
+        }
+        btn32.onclick = function(event){
+            alert("未阻止传播");
+            //有两个弹窗：阻止传播 + div clicked
+        }
+        div.onclick = function(event){
+            alert("div clicked!");
+        }
+    </script>
+    <div></div>
+    
+    <li>event.eventPhase用来确定事件当前正处于事件流的哪个阶段。</li>
+    <p>捕获阶段——1    处于目标对象上——2    冒泡阶段——3</p> 
+    <input type="button" id="fourthButton" value="fourthButton">
+    <script>
+        var btn4 = document.getElementById("fourthButton");
+
+        btn4.onclick = function(event){
+            alert(event.eventPhase);//2
+        };
+        document.body.addEventListener("click", function (event) {
+            alert(event.eventPhase);//1
+        }, true);
+        document.body.onclick = function(event){
+            alert(event.eventPhase);//3
+        };
+    </script>
+    <div></div>
+    </ul> 
+</body>
+
+</html>

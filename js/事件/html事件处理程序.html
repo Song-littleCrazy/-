@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- html事件处理程序 -->
+
+    <!-- 1、在HTML中定义的事件处理程序 直接包含要执行的具体动作-->
+    <input type="button" value="Click Me（在HTML中定义的事件处理程序 直接包含要执行的具体动作）" onclick="alert('Clicked')" />
+    <div></div>
+
+    <!-- 2、调用在页面其他地方定义的脚本 -->
+    <input type="button" value="Click Me（在HTML中定义的事件处理程序 调用在页面其他地方定义的脚本）" onclick="shoeMessage()" />
+    <script type="text/javascript">
+        function shoeMessage() {
+            alert("Hello world!");
+        }
+    </script>
+    <div></div>
+
+    <!-- 2的优点： 首先会创建一个封装这元素属性值的函数。这个函数中有一个局部变量event——事件对象。 此例返回type -->
+    <input type="button" value="Click Me（直接访问事件对象——event.type）" onclick="alert(event.type)" />
+    <div></div>
+
+    <!-- 在函数内部，this值等于事件的目标元素 -->
+    <input type="button" value="Click Me (访问this——即该事件的目标元素 this.value)" onclick="alert(this.value)" />
+    <div></div>
+
+    <!-- 动态创建函数的有意思的地方：扩展作用域-->
+    <!-- 像访问局部变量一样访问document及该元素本身的成员-->
+    <!-- 相当于    
+        function () {
+            with(document){
+                with(this){
+                    //元素属性值
+                }
+            }
+        } -->
+    <input type="button" value="Click Me (访问自己的属性)" onclick="alert(value)">
+    <div></div>
+    
+    <!-- 若当前元素是一个表单输入元素，则作用域中还会包含访问表单元素（父元素）的入口，这个函数就变成：
+        function () {
+            with(document){
+                with(this.form){
+                    with(this){
+                    //元素属性值
+                    }
+                }
+            }
+        }
+    -->
+    <form action="" method="post">
+        <input type="text" name="username" value="">
+        <input type="button" value="Echo Username" onclick="alert(username.value)">
+    </form>
+
+    <!-- html指定事件处理程序的缺点。
+        1、存在时差问题——因为用户可能会在html元素一出现在页面上就触发相应的事件，但当时的事件处理程序有可能尚不具备执行条件。
+        2、扩展事件处理程序的作用域链在不同的浏览器中会导致不同结果。 
+        3、HTML和JavaScript代码紧密耦合。如果要更换世家处理程序，则两个地方都要改：html和js。
+    -->
+</body>
+
+</html>
