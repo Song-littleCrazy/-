@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>事件练习</title>
+</head>
+
+<body>
+    <button id="btn">点击按钮连续弹窗5次</button>
+    <div></div>
+
+    <button id="changebtn">批量修改样式</button>
+    <div class="nn">1</div>
+    <div class="nn">2</div>
+    <div class="nn">3</div>
+
+    <div id="links">
+        <input type="checkbox" name="" value="" id="" class="x">
+        <input type="checkbox" name="" value="" id="" class="x">
+        <input type="checkbox" name="" value="" id="" class="x">
+        <input type="checkbox" name="" value="" id="" class="x">
+        <input type="checkbox" name="" value="" id="" class="x">
+        <div></div>
+        <input type="button" id="selectall" value="全选">
+        <input type="button" id="antiselect" value="反选">
+        <input type="button" id="noselect" value="全不选">
+    </div>
+
+    <script>
+        var btn = document.getElementById("btn");
+        btn.addEventListener("click", function () {
+            for (var i = 1; i <= 5; i++) {
+                alert("第" + i + "次弹窗")
+            }
+        }, false)
+
+        var changebtn = document.getElementById("changebtn");
+        changebtn.addEventListener("click", function () {
+            var nn = document.getElementsByClassName("nn");
+            for (var i = 0; i < nn.length; i++) {
+                nn[i].style.color = "lightblue";
+            }
+        }, false);
+
+
+        var selectall = document.getElementById("selectall");
+        var noselect = document.getElementById("noselect");
+        var antiselect = document.getElementById("antiselect");
+        var xx = document.getElementsByClassName("x");
+        antiselect.addEventListener("click", function () {
+            for (var i = 0; i < xx.length; i++) {
+                if (xx[i].checked) {
+                    xx[i].checked = false;
+                } else {
+                    xx[i].checked = true;
+                }
+            }
+        }, false);
+
+        noselect.addEventListener("click", function () {
+            for (var i = 0; i < xx.length; i++) {
+                xx[i].checked = false;
+
+            }
+        }, false);
+
+        selectall.addEventListener("click", function () {
+            for (var i = 0; i < xx.length; i++) {
+                xx[i].checked = true;
+
+            }
+        }, false);
+    </script>
+</body>
+
+</html>
