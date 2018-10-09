@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>事件委托</title>
+</head>
+<body>
+    <ul id="mylinks">
+        <li id="gosomewhere">Go somewhere</li>
+        <li id="dosomething">Do something</li>
+        <li id="sayhi">Say hi</li>
+    </ul>
+
+    <script>
+        //通过对一个父元素中子元素id的选择，减少dom访问次数，提高性能
+        //事件委托——利用冒泡事件，只指定一个事件处理程序，就可以管理某一类型的所有事件。
+        var list = document.getElementById("mylinks");
+
+        list.addEventListener("click",function(event){
+            event = event ? event : window.event;
+            var target = event.target || event.srcElement;
+
+            switch(target.id){
+                case "gosomewhere": location.href = "http://www.baidu.com"; break;
+                case "dosomething": document.title = "I changed the title"; break;
+                case "sayhi": alert("hi"); break;
+            }
+        },false)
+    </script>
+</body>
+</html>

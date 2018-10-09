@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>移除事件处理程序</title>
+</head>
+
+<body>
+    <div id="myDiv"> <input type="button" value="Click Me" id="myBtn"> </div>
+    <script type="text/javascript">
+
+    //由于内存中存在一些不用的“空事件处理程序”会造成程序内存与性能问题。
+    //在两种情况下，可能会造成上述问题。
+    //第一种情况就是从文档中移除带有事件处理程序的元素时。 这可能是通过纯粹的 DOM操作，例如使用 removeChild()和 replaceChild()方法
+    //第二种情况是发 生在使用 innerHTML 替换页面中某一部分的时候。如果带有事件处理程序的元素被 innerHTML 删除 了，那么原来添加到元素中的事件处理程序极有可能无法被当作垃圾回收
+        
+        var btn = document.getElementById("myBtn");
+        btn.onclick = function () {
+
+            //先执行某些操作 
+
+            btn.onclick = null; //移除事件处理程序 
+            document.getElementById("myDiv").innerHTML = "Processing...";
+        };
+    </script>
+
+</body>
+
+</html>

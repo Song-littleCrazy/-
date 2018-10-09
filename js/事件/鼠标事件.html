@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>鼠标点击事件</title>
+</head>
+
+<body>
+    <div id="firstDiv" style="width:600px;height:900px;background-color:lightblue">点击，获取坐标</div>
+    <script>
+        var div1 = document.getElementById("firstDiv");
+        div1.addEventListener("click", function (event) {
+            event = event ? event : window.event;
+            //客户端坐标
+            alert("客户端坐标client（相对于浏览器的窗口）：" + event.clientX +","+ event.clientY);
+
+            //页面坐标
+            var pageX = event.pageX,
+                pageY = event.pageY;
+            
+            //ie8及更早的版本不支持事件对象的页面坐标，需要用客户区坐标+滚动信息(scrollLeft/scrollTop)计算
+            //考虑document.body（混杂模式）和document.documentElement（标准模式）
+            if(pageX === undefined){
+                pageX = event.clientX + ( document.body.scrollLeft || document.documentELement.scrollLeft );
+            }
+            if(pageY === undefined){
+                pageY = event.clientY + ( document.body.scrollTop || document.documentElement.scrollTop);
+            }
+            alert("页面坐标page（相对与最开始的距离，包含滚动的数据）：" + pageX +","+ pageY);
+
+            //屏幕坐标
+            alert("屏幕坐标screen（相对于整个电脑显示屏）:" + event.screenX +","+event.screenY);
+
+
+        }, false)
+    </script>
+</body>
+
+</html>
