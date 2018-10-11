@@ -78,9 +78,9 @@ DOM构成：
 操作样式：
 -
 
- - 直接在想要动态设置样式的元素内部添加内联样式。
+ - 1. 直接在想要动态设置样式的元素内部添加内联样式。
  -  `para.style.color = 'white'; para.style.backgroundColor = 'black';`
- - 在`<style>`中设置样式
+ - 2. 在`<style>`中设置样式
  - `.highlight {
       color: white;
       background-color: black;
@@ -93,3 +93,54 @@ DOM构成：
  - 以上两种方法各有优缺点，根据需要自行选择。
     
     
+ 1. 改变html元素的：
+-
+   - 内容：`document.getElementById(id).innerHTML=new HTML`
+   - 属性：`document.getElementById(id).attribute = new value`
+   - (例子：`document.getElementById("image").src="landscape.jpg";`)
+   - 样式：`document.getElementById(id).style.property=new style`
+     - style的属性[http://www.w3school.com.cn/jsref/dom_obj_style.asp](http://www.w3school.com.cn/jsref/dom_obj_style.asp "w3school关于style的一些属性")：
+       - background:
+       - border、padding和margin
+       - positioning：如botoom/left/right/top/zIndex/position
+       - 布局
+       - text 
+
+
+ 2. 改变css样式：
+-
+
+ - 四种方法及其优缺点[https://www.cnblogs.com/aademeng/articles/6279060.html](https://www.cnblogs.com/aademeng/articles/6279060.html)：
+   - 1、 使用obj.className来修改样式表的类名。
+     - `obj.style.backgroundColor= "black";`
+     - style = 内联式>外联式;由于horver伪类位于内联式中，所以伪类会被覆盖。
+     - 即时修改样式，并覆盖掉其他方式的设置。
+   - 2、使用obj.style.cssTest来修改嵌入式的css。
+     - [https://www.cnblogs.com/majingyi/p/6840818.html](https://www.cnblogs.com/majingyi/p/6840818.html)
+     - `obj.style.cssText = " display:block;color:White;`
+     - cssTExt本质——设置html元素的style属性值。
+     - 优点1：避免页面reflow（像1中被定义n多次），提高页面性能。  
+     - 优点2：可以累加，但要注意加分号：`obj.style.cssText += " ；display:block;color:White;`
+     - 缺点同上。
+   - 3、使用obj.className来修改样式表的类名。
+     - [https://www.cnblogs.com/GreenLeaves/p/5757216.html](https://www.cnblogs.com/GreenLeaves/p/5757216.html)- 
+     - `obj.setAttribute("class", "style2");`
+     - `obj.className = "style2";`
+     - 两种方法实现。比上面两种的效果好很多。
+     - 优点：实现了样式与行为的分离，减少代码量。在后期需求不确定时 ，用此方法。
+     - 缺陷：通过className设置元素的class属性时将替换（而不是追加）该元素原有的class属性。
+     - 自定义追加classname的效果的代码：
+     
+
+     -     `function addClass(element,value) {`
+    `if (!element.className) { element.className = value; }` 
+    `else {`
+    `newClassName = element.className;`
+    `newClassName += " "; //这句代码追加的类名分开`
+    `newClassName += value;`
+    `element.className = newClassName; }`
+    `}`
+   - 4、使用更改外联的css文件，从而改变元素的css
+     - `<link href="css1.css" rel="stylesheet" type="text/css" id="css"/>`
+   `obj.setAttribute("href","css2.css");`
+     - 实现整体页面换肤的最佳方案
