@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>
+        window.onload =function(){
+            var count = 0;
+            var max = 20;
+            function add(max){
+                if(count>max){
+                    alert("计数已经超过20啦！！！");
+                    clearInterval(addnum);
+                }
+                document.getElementById("name").innerHTML = count;
+                count = count+1;
+            }
+
+            var addnum = setInterval(add,1000,max);//两种方式，add或"add()",推荐使用前者
+
+            document.getElementById("btn").onclick = function (){
+                clearInterval(addnum);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="name">0</div>
+    <button id="btn">我不管，我要停止</button>
+</body>
+</html>

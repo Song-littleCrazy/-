@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="start" onclick="start1()">开始计时</button>
+    <input type="text" id="fen" value="0">分
+    <input type="text" id="miao" value="0">秒
+
+    <script>
+        function start1() {
+            var i = Number(document.getElementById("fen").value),
+                j = Number(document.getElementById("miao").value);
+            setTimeout(function () {
+                i = i + 1;
+                document.getElementById("fen").value = i;
+            }, 10000)
+            setTimeout(function () {
+                j = j + 1;
+                if (j >= 9) {
+                    j = j % 10;
+                }
+                document.getElementById("miao").value = j;
+                start1();
+            }, 1000)
+        }
+    </script>
+</body>
+
+</html>

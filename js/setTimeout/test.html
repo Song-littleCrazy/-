@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        setInterval("var a=1;var b=2;c=a+b;alert(c);",1000); //大家说这个会是什么呢 ？
+        //不停的弹出3
+
+        function fun() {
+            alert(1);
+        }
+        setInterval("alert(fun)",2000);
+        //弹出function fun() {    alert(1); }
+    </script>
+</body>
+</html>
