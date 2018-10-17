@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,54 @@
     <title>vue</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
+
 <body>
     <div id="app">
         <p>{{ message }}</p>
     </div>
+
+    <div id="app-2">
+        <span v-bind:title="message">
+            鼠标悬停几秒钟查看此处动态绑定的提示信息！
+        </span>
+    </div>
+    <div></div>
+
+    <div id="app-3">
+        <span v-if="seen">
+            你可以看见我！
+        </span>
+    </div>
+
+    <div id="app-4">
+        <ol>
+            <li v-for="todo in todos">
+                {{ todo.text }}
+            </li>
+        </ol>
+    </div>
+
+    <div id="app-5">
+        <p>{{ message }}</p>
+        <button v-on:click="reverseMessage">逆转消息</button>
+    </div>
+
+    <div id="app-6">
+        <p>{{ message }}</p>
+        <input v-model="message">
+    </div>
+
+    <div id="app-7">
+        <ol>
+            <todo-item v-for="item in groceryList" v-bind:todo='item' v-bind:key="item.id"></todo-item>
+        </ol>
+    </div>
+
+
+
+
+
+
     <script>
         var app = new Vue({
             el: '#app',
@@ -18,6 +63,87 @@
                 message: 'Hello Vue.js！'
             }
         })
+        //在console上进行修改，就会发现显示的文字变了---->响应式
+        //app.message = 'I have changed the message!';
+
+        //v-bind为指令，指令带有前缀v-，以表示它们是vue提供的特殊性
+        //v-bind将这个元素节点的title特性和vue实例的message属性保持一致
+        var app2 = new Vue({
+            el: '#app-2',
+            data: {
+                message: '页面加载于' + new Date().toLocaleString()
+            }
+        })
+
+        //v-if指令，不仅可以把数据绑定到dom文本或特性，还可以绑定到dom结构
+        var app3 = new Vue({
+            el: '#app-3',
+            data: {
+                seen: true
+            }
+        })
+        //当输入app3.seen = false时，就会消失
+
+        var app4 = new Vue({
+            el: '#app-4',
+            data: {
+                todos: [{
+                        text: '学习JavaScript'
+                    },
+                    {
+                        text: '学习Vue'
+                    },
+                    {
+                        text: '整个牛项目'
+                    }
+                ]
+            }
+        })
+        //通过app4.todos.push({ text: '新项目'})添加新项目
+
+        var app5 = new Vue({
+            el: '#app-5',
+            data: {
+                message: 'I am Crazy S'
+            },
+            methods: {
+                reverseMessage: function () {
+                    this.message = this.message.split('').reverse().join('');
+                }
+            }
+        })
+
+        //v-model指令：实现表单输入和应用状态之间的双向绑定
+        var app6 = new Vue({
+            el: '#app-6',
+            data: {
+                message: 'Nice to meet you!'
+            }
+        })
+
+        //定义一个组件
+        // Vue.component('todo-item',{
+        //     template: '<li>这是一个待办项</li>'
+        // })
+
+        //对上面的组件进行扩展，增加一个prop
+        Vue.component('todo-item', {
+            props: ['todo'],
+            template: '<li>{{todo.text}}</li>'
+        })
+
+        var app7 = new Vue({
+            el:'#app-7',
+            data:{
+                groceryList: [
+                    {id: 0, text: '蔬菜'},
+                    {id:1, text: '奶酪'},
+                    {id: 2, text: '小零食'}
+                ]
+            }
+        })
     </script>
+
 </body>
+
 </html>
