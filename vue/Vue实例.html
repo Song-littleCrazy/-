@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue实例</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+</head>
+<body>
+    <div id="demo">
+        <p>{{ foo }}</p>
+        <!-- 这里的foo不会更新 -->
+        <button v-on:click="foo = 'baz'">点了也不会变</button>
+    </div>
+    <script>
+        
+        var data = {
+            a:1,
+            //当一个属性可能晚些时候会用，需要设一些初始值
+            newTodoText: '',
+            visitCount: 0,
+            hideCompletedTodos: false,
+            todos:[],
+            error: null
+        }   
+        
+        var vm = new Vue({
+            data: data,
+            //created钩子可以用来在一个实例被创建之后执行代码
+            created: function(){
+                //this指这个vm实例
+                console.log('a is'+this.a)
+            }
+        })
+
+        //运用Object.freeze()阻止修改现有的属性
+        var obj={
+            foo: 'bar'
+        }
+        Object.freeze(obj)
+        var demo = new Vue({
+            el: '#demo',
+            data:obj
+        })
+
+        //添加前缀$,以便和用户定义的属性区分开来
+        console.log(demo.$data === obj);
+        console.log(demo.$el === document.getElementById('demo'));
+        
+    </script>
+</body>
+</html>
