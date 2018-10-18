@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>事件处理</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+</head>
+
+<body>
+    <!-- 监听DOM事件，并在触发时运行一些JavaScript代码 -->
+    <div id="example-1">
+        <button v-on:click="counter += 1">Add 1</button>
+        <p>The button above has clicked {{ counter }} times.</p>
+    </div>
+
+    <!-- 直接接收方法名 -->
+    <div id="example-2">
+        <button v-on:click="greet">Greet</button>
+    </div>
+
+    <!-- 在内联js中调用方法 -->
+    <div id="example-3">
+        <button v-on:click="say('hi')">Say hi</button>
+        <button v-on:click="say('what')">Say what</button>
+    </div>
+
+    <script>
+        var example1 = new Vue({
+            el: '#example-1',
+            data: {
+                counter: 0
+            }
+        })
+
+        var example2 = new Vue({
+            el: '#example-2',
+            data: {
+                name: 'Crazy'
+            },
+            //定义方法
+            methods: {
+                greet: function (event) {
+                    alert('Hello' + this.name + '!')
+                    if (event) {
+                        alert(event.target.tagName)
+                    }
+                }
+            }
+        })
+        //直接用js调方法
+        //example2.greet()
+
+        var example3 = new Vue({
+            el: '#example-3',
+            methods: {
+                say: function(message) {
+                    alert(message)
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
