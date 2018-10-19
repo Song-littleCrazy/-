@@ -14,13 +14,6 @@ vue允许把网页分割成可复用的组件。每个组件都有相应的html�
 vue是响应式的（reactive）。当我们的数据变更时，vue会更新所有网页中用到它的地方。
 
 
-标签
-
-组件系统——
--
-
-一个组件本质上是一个拥有预定义选项的一个vue实例。
-
 
 
 响应式
@@ -111,6 +104,10 @@ vue是响应式的（reactive）。当我们的数据变更时，vue会更新所
 
   - 侦听器watch——当数据变化时执行一部或者开销比较大的操作时，此方法最有用。
 
+
+
+**标签**
+---
 
 Class与Style绑定
 -
@@ -203,6 +200,114 @@ Class与Style绑定
     - 当一个 ViewModel 被销毁时，所有的事件处理器都会自动被删除。
 
 
+表单输入
+-
+
+  - v-model
+    - 在表单`<input>`、`<textarea>`、`<select>`元素上创建双向数据绑定。根据控件类型自动选取正确的方法来更新元素。
+    - v-model会忽略所有表单元素的value、checked、selected特性的初始值而总是将Vue实例的数据（通过data声明初始值）作为数据来源。
+  - v-bind
+    - 把值绑定到vue实例的动态属性上，并且这个属性的值不可以为字符串。
+  - 修饰符
+    - .lazy：默认情况下，v-model在每次input事件触发后将输入框的值与数据进行同步。通过添加`v-model.lazy="msg"`转变为使用change事件进行同步。
+    - .number：自动的将用户的输入值转换为数值类型。`<input v-model.number="age" type="number">`
+    - .trim：自动过滤用户输入的首尾空白字符。`v-model.trim="msg"`
+
+
+
+
+**组件系统**
+---
+
+一个组件本质上是一个拥有预定义选项的一个vue实例。
+
+ - 组件的复用性
+   - 每用一次组件，就会有一个新的实例被创建，各个实例之间互不影响。
+   - data必须是一个函数，这样每个实例可以维护一份被返回对象的对立拷贝。
+ - 组件的组织
+   - 以一棵嵌套的组件树的形式来组织
+   - 注册类型：全局注册（`Vue.component`）和局部注册
+ - 通过prop向子组件传递数据
+   - prop——在组件上注册的一些自定义特性。
+    - 当一个值传给一个prop特性的时候，它就会变成那个组件实例的一个属性。
+   - 一个组件默认可以拥有任意数量的prop，任何值都可以传递给任何prop。 
+ - 单个根元素：
+   -  每个组件必须只有一个根元素
+ -  通过事件向父级组件发送消息
+
+
+组件注册
+-
+
+ - 组件名:
+   - kebab-case(短横线分隔命名)：定义和引用都要使用这种形式。直接在DOM中使用时，只有分隔符是有效的。
+   - PascalCase(驼峰式命名)：用驼峰定义，引用时两种方法都可以。
+ - 全局注册
+   - `Vue.component('my-component-name',{   })`
+   - 注册后可以在任何新创建的Vue根实例的模板中。 
+ - 局部注册
+   - 通过一个普通的JavaScript对象来定义组件，
+   - `var ComponentA = { /* ... */ }`
+    `var ComponentB = { /* ... */ }`
+   - 然后在component选项中定义你想要使用的组件。
+   - `new Vue({`
+      `el: '#app',`
+      `components: {`
+        `'component-a': ComponentA,`
+        `'component-b': ComponentB`
+        `}`
+    ` })`
+   - 注意：局部注册的组件在其子组件中不可用。
+
+
+prop
+-
+
+  - Prop类型：
+    - 以字符串数组形式列出：
+    - `props: ['title', 'likes', 'isPublished', 'commentIds', 'author']`
+    - 以对象形式列出prop：
+    - `props: {  title: String,  likes: Number,  isPublished: Boolean,  commentIds: Array,  author: Object  }`
+  - 传递静态或动态Prop
+    - 静态：
+    `<blog-post title="My journey with Vue"></blog-post>`
+    - 动态：   
+    `<!-- 动态赋予一个变量的值 -->`
+	`<blog-post v-bind:title="post.title"></blog-post>`
+    `<!-- 动态赋予一个复杂表达式的值 -->`
+    `<blog-post v-bind:title="post.title + ' by ' + post.author.name"></blog-post>`
+    - 传入数字
+    - 传入布尔值
+    - 传入对象
+    - 传入一个对象的所有属性
+  - 单项数据流：
+    - 所有的prop都使得其父子prop之间形成了一个单向下行绑定。父级prop的更新会向下流动到子组件中，但反过来不行。这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流难以理解。
+    - 两种常见的试图改变一个prop的情形：
+      - 1、这个prop用来传递一个初始值；这个子组件接下来希望将其作为一个本地的prop数据来使用。（定义一个本地的data属性，并将这个prop用作其初始值）
+      - 2、这个prop以一种原始的值传入，且需要进行转换。（最好使用这个prop值历来定义一个计算属性）
+  - prop验证
+    - 类型检查type：
+      - 既可以是原生构造函数（String、Number、Boolean、Array、Object、Date、Function、Symbol）中的一个
+      - 也可以是自定义的构造函数，并通过instanceof来进行检查确认。
+  - 非prop特性
+    - 一个非prop特性是指向一个组件，但是该组件并没有相应的prop定义的特性。
+    - 替换或合并已有的特性
+      - type="text"会被type="date"替换
+      - class和style的值会被合并
+    - 禁用特性继承
+       - 通过在组件的选项中设置`inheritAttrs:false`
+       - 尤其适用于配合实例的`$attrs`属性的使用，该属性包含了传递给一个数组的特性名和特性值
+
+
+自定义事件
+-
+
+  - 事件名
+    - 没有大小写的限制
+    - 推荐使用kebab-case的事件名
+  - 自定义组件的v-model
+  - 将原生事件绑定到组件
+  - .sync修饰符
 
 
 
@@ -213,3 +318,16 @@ Class与Style绑定
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+需要学习：双向绑定，指令，事件，组件 
