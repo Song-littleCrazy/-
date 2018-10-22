@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>模板语法</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="html-1">
+        <p>Using mustaches: {{message}}</p>
+        <p>Using v-html directive: <span v-html="message"></span></p>
+    </div>
+    <hr>
+
+    <div id="html-2">
+        <span v-once>使用v-once使这个值不会改变：{{ msg }}</span>
+    </div>
+    <hr>
+
+    <div id="html-3">
+        <p>在开发者工具中的element中查看</p>
+        <button v-bind:disabled="isButtonDisabled">Button</button>
+    </div>
+
+    <div id="html-4">
+        <p>{{age>18?'成年人':'小孩子'}}</p>
+    </div>
+
+
+    <script>
+        //双大括号会将数据解释为普通文本，而非 HTML 代码。
+        //为了输出真正的 HTML，你需要使用 v-html 指令
+        var html1 = new Vue({
+            el: '#html-1',
+            data: {
+                message: '<span style="color:red">This should be red</span>'
+            }
+        })
+        //通过使用 v-once 指令，你也能执行一次性地插值，当数据改变时，插值处的内容不会更新。
+        //但请留心这会影响到该节点上的其它数据绑定：
+        var html2 = new Vue({
+            el: '#html-2',
+            data: {
+                msg: 'unchanged'
+            }
+        })
+        // HTML 特性上，使用 v-bind 指令
+        //在开发者工具中的element中查看：
+        //若isButtonDisabled为true，则会出现<button disabled="disabled">Button</button>
+        //若isButtonDisabled为null/false/undefined，则disabled属性不会被包含在渲染出来的<button>元素中
+        var html3 = new Vue({
+            el: '#html-3',
+            data: {
+                isButtonDisabled: true
+            }
+        })
+        //对于所有的数据绑定，Vue.js 都提供了完全的 JavaScript 表达式支持。
+        //。有个限制就是，每个绑定都只能包含单个表达式。
+        var html4 = new Vue({
+            el: '#html-4',
+            data: {
+                age:20
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="count-1">{{fullName}}</div>
+
+    <div id="count-2">
+        <p>{{fullName}}</p>
+        <input type="text" v-model="firstName">
+        <input type="text" v-model="lastName">
+    </div>
+
+    <div id="count-3">
+            <p>{{fullName}}</p>
+            <input type="text" v-model="fullName">
+            <input type="text" v-model="firstName">
+            <input type="text" v-model="lastName">
+        </div>
+
+    <script>
+        var count3 = new Vue({
+            el: '#count-3',
+            data: {
+                firstName: 'Xiao',
+                lastName:'Jie'
+            },
+            computed: {
+                fullName: {
+                    get(){
+                        console.log('getter')
+                        return this.firstName + ' ' +this.lastName
+                    },
+                    set(newValue){
+                        console.log('setter')
+                        var names = newValue.split(' ')
+                        this.firstName = names[0]
+                        this.lastName = names[names.length - 1]
+                        return this.firstName + ' '+ this.lastName
+                    }
+                }
+            },
+            updated() {
+                console.log('update...s')
+            }
+            //如果修改fullName就会触发setter，同时也会触发getter和updated函数。
+            //执行顺序：setter->getter->updated
+            //更改firstName或lastName就只会触发getter->updated
+            //如果注释掉setter中的firstName和lastName，就不会触发getter，说明setter和getter没有关联
+        })
+        var count1 = new Vue({
+            el: '#count-1',
+            data: {
+                firstName: 'Ni',
+                lastName:'Hao'
+            },
+            computed: {
+                fullName: function () {
+                    return this.firstName +' '+ this.lastName
+                }
+            }
+            //computed的完整写法：
+            // computed: {
+            //     fullName:  {
+            //         get(){
+            //             return this.firstName +' '+ this.lastName
+            //         }
+            //     }
+            // }
+        })
+        var count2 = new Vue({
+            el: '#count-2',
+            data: {
+                firstName: 'Song',
+                lastName:'Crazy'
+            },
+            computed: {
+                fullName: function () {
+                    console.log('computed getter')
+                    return this.firstName +' '+ this.lastName
+                }
+            },
+            updated() {
+                console.log('updated')
+            }
+            //需要注意的是：不是说更改了getter里使用的变量就会触发computed的更新，前提是computed里的值必须要在模板里才行。
+            //如果把div里的fullName注释掉，就不会触发getter，但是还是会触发updated
+        })
+    </script>
+</body>
+
+</html>

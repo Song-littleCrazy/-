@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>prop</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <!-- props验证 -->
+    <div id="prop-1">
+        <blog-in v-bind:author="sss"></blog-in>
+    </div>
+    <div id="prop-2">
+        <blog-in v-bind:result="show"></blog-in>
+    </div>
+    <script>
+        //自定义构造函数
+        function Person(firstName, lastName) {
+            this.firstName = firstName
+            this.lastName = lastName
+        }
+        Vue.component('blog-in', {
+            props: {
+                author: Person
+            },
+            template: "<p>{{author}}</p>"
+        })
+        var prop1 = new Vue({
+            el: '#prop-1',
+            data: {
+                sss: new Person("aa", "bb")
+            }
+        })
+
+        //自定义函数
+        Vue.component('blog-in', {
+            props: {
+                result: {
+                    validator: function (value) {
+                        // 这个值必须匹配下列字符串中的一个
+                        return ['success', 'warning', 'danger'].indexOf(value) !== -1
+                    }
+                }
+            },
+            template: "<p>{{result}}</p>"
+        })
+        var prop2 = new Vue({
+            el: '#prop-2',
+            data: {
+                show: "success"
+            }
+        })
+    </script>
+</body>
+
+</html>
