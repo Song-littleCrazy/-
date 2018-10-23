@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Class与Style绑定</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="demo-1" class="static" v-bind:class="{ active: isActive, 'text-danger': hasError }">在开发者工具中查看class类值</div>
+    <div id="demo-2" class="static" v-bind:class="classObject">在开发者工具中查看class类值(上面的等价替换)</div>
+    <div id="demo-3" class="static" v-bind:class="classObject">在开发者工具中查看class类值(使用计算属性)</div>
+
+    <div id="demo-4" v-bind:class="[activeClass,errorClass]">在开发者工具中查看class类值(上面三行是用对象的方式，这是用数组的方法)</div>
+    <div id="demo-5" v-bind:class="[isActive?activeClass: '',errorClass]">在开发者工具中查看class类值(上面三行是用对象的方式，这是用数组的方法)</div>
+    <div id="demo-6">
+        <my-component v-bind:class="{active: isActive}">在开发者工具中查看class类值(用组件的方法)</my-component>
+    </div>
+    <script>
+        //前三种为对象语法
+        //通过修改isActive和hasError的值来改变class的值
+        var static1 = new Vue({
+            el: '#demo-1',
+            data: {
+                isActive: true,
+                hasError: false
+            }
+        })
+
+        //绑定的数据对象可以不用内联定义到模板里
+        var demo2 = new Vue({
+            el: '#demo-2',
+            data: {
+                classObject: {
+                    active: true,
+                    'text-danger': false
+                }
+            }
+        })
+
+        //还可以绑定在一个返回对象的计算属性
+        var demo3 = new Vue({
+            el: '#demo-3',
+            data: {
+                isActive: true,
+                error: null
+            },
+            computed: {
+                classObject: function () {
+                    return {
+                        active: this.isActive && !this.error,
+                        'text-danger': this.error && this.error.type === 'fatal'
+                    }
+                }
+            }
+        })
+
+        //接下来是数组语法
+        //
+        var demo4 = new Vue({
+            el: '#demo-4',
+            data: {
+                activeClass: 'active',
+                errorClass: 'text-danger'
+            }
+        })
+        //这样写将始终添加 errorClass，但是只有在 isActive 是 truthy[1] 时才添加 activeClass。
+        var demo5 = new Vue({
+            el: '#demo-5',
+            data: {
+                //isActive: true,
+                activeClass: 'active',
+                errorClass: 'text-danger'
+            }
+        })
+
+        //利用组件添加class
+        Vue.component('my-component', {
+            template: '<p class="foo bar">Hi</p>'
+        })
+        var demo6 = new Vue({
+            el: '#demo-6',
+            data: {
+                isActive: true
+            }
+        })
+    </script>
+</body>
+
+</html>

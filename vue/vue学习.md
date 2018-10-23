@@ -238,7 +238,28 @@ Class与Style绑定
 用v-bind处理，通过表达式计算出字符串结果
 
   - 绑定class：`v-bind:class=""`
+    - 对象语法：
+      - `<div v-bind:class="{ active: isActive, 'text-danger': hasError  }"></div>`
+      - `data: {  isActive: true,  hasError: false  }`
+    - 数组语法：
+      - `<div v-bind:class="[activeClass, errorClass]"></div>`
+      - `data: {  activeClass: 'active',  errorClass: 'text-danger'}`
+    - 组件：
+      - `Vue.component('my-component', {  template: '<p class="foo bar">Hi</p>'  })`
+      - `<my-component class="baz boo"></my-component>`
+      - 最后被渲染为：`<p class="foo bar baz boo">Hi</p>`
+
+
   - 绑定内联样式：`v-bind:style=""`
+    - 对象语法：
+      - `<div v-bind:style="styleObject"></div>`
+      - `data: {  styleObject: {    color: 'red',    fontSize: '13px'  } }`
+    - 数组语法：
+      - `<div v-bind:style="[baseStyles, overridingStyles]"></div>`
+      - `data: {  styleObject: {    color: 'orange',    fontSize: '13px' }}`
+    - 多重值：
+      - `<div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>`
+
 
 
 条件渲染
@@ -247,6 +268,7 @@ Class与Style绑定
   - v-if：
     - `<h1 v-if='ok'>OK</h1>`
     - `<h1 v-else>NO</h1>`
+    - 在 <template> 元素上使用 v-if 条件渲染分组
     - 用key属性使两个元素完全独立，不再复用，从而得到不同的值
   - v-show：
     - 带有v-show的元素始终会被渲染并保留在DOM中。
@@ -255,7 +277,7 @@ Class与Style绑定
   - v-show和v-if区别：
     - v-if是“真正”的条件渲染，因为它会确保在切换过程中条件块的事件监听器和子组件适当的被销毁和重建。
     - v-if是惰性的：在初始渲染条件为假时，则什么也不做，直到第一次条件变为真时，才开始渲染条件块。
-    - v-show不管初始条件是什么，元素都会被渲染，并且只是简单地基于css进行切换。
+    - v-show不管初始条件是什么，元素都会被渲染，并且只是简单地基于css进行切换（display）。
     - 综上，v-if有更高的切换开销，而v-show有更高的初始渲染开销。所以需要频繁的切换——>v-show； 在运行时，条件很少改变——>v-if。
      
 列表渲染
@@ -283,6 +305,22 @@ Class与Style绑定
       - filter()
       - concat() 
       - slice()
+    - 注意事项：
+      - 向嵌套对象添加响应式属性的两种方法：
+          - 1、`Vue.set(object, key, value)`
+          - 示例：`Vue.set(vm.userProfile, 'age', 27)`
+          - 2、`vm.$set(vm.userProfile, 'age', 27)`
+      - 当需要赋予多个值时，用Object.assign()或_.extend()
+          - `vm.userProfile = Object.assign({}, vm.userProfile, {  age: 27,  favoriteColor: 'Vue Green'  })`
+
+  - 显示过滤/排序结果
+    - `<li v-for="n in 函数(参数)">{{ n }}</li>`
+    
+  - v-for和v-if
+    - 当他们处于同一节点时，v-for的优先级比v-if的优先级高，这意味着v-if将会重复运行于每个v-for循环中。
+    - 适用于想为仅有的一些项渲染节点。 
+    - `<li v-for="todo in todos" v-if="!todo.isComplete"> {{ todo }} </li>`
+    - 也可以把v-if置于外层，进行有条件地跳过执行的循环
 
 
 事件处理

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Class与Style绑定</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="demo-1" v-bind:style="{ color: activeColor, fontSize: fontSize+'px' }">内联样式</div>
+    <div id="demo-2" v-bind:style="styleObject">内联样式(直接绑定到一个样式对象上，让模板更清晰)</div>
+    
+    <div id="demo-3" v-bind:style="[baseStyles,overridingStyles]">内联样式(用数组的方法)</div>
+    
+    <div id="demo-4" v-bind:style="{ display: ['-webkit-box','-ms-flexbox','flex']}">内联样式(多重值)</div>
+    
+    <script>
+        //对象语法
+        var static1 = new Vue({
+            el: '#demo-1',
+            data: {
+                activeColor: 'red',
+                fontSize: 20
+            }
+        })
+
+        //直接绑定到一个样式对象上，让模板更清晰
+        var demo2 = new Vue({
+            el: '#demo-2',
+            data: {
+                styleObject: {
+                    color: 'orange',
+                    fontSize: '13px'
+                }
+            }
+        })
+
+        //接下来是数组语法
+        var demo3 = new Vue({
+            el: '#demo-3',
+            data: {
+                baseStyles: {color: 'yellow',fontSize: '15px'},
+                overridingStyles: {backgroundColor: 'green'}
+            }
+        })
+
+        
+    </script>
+</body>
+
+</html>

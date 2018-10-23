@@ -17,6 +17,7 @@
             {{ item.message }}
         </li>
     </ul>
+    <hr>
 
     <!-- v-for支持索引 -->
     <ul id="example-2">
@@ -24,6 +25,7 @@
             {{ parentMessage }} - {{ index }} - {{ item.message}}
         </li>
     </ul>
+    <hr>
 
     <!-- 可以通过一个对象的属性来迭代 -->
     <ul id="v-for-object" class="demo">
@@ -31,16 +33,21 @@
             {{ value }}
         </li>
     </ul>
+    <hr>
 
     <!-- 提供第二个的参数为键名 -->
-    <div v-for="(value, key) in object">
-        {{ key }}: {{ value }}
+    <div id="vm-for">
+        <li v-for="(value,key) in useProfile">{{ key }} : {{ value }}</li>
     </div>
+    <hr>
 
     <!-- 第三个参数为索引 -->
-    <div v-for="(value, key, index) in object">
-        {{ index }}: {{ key }}: {{ value }}
+    <div id="vm-for2">
+        <li v-for="(value, key, index) in object">
+            {{ index }}: {{ key }}: {{ value }}
+        </li>
     </div>
+    <hr>
 
     <!-- 显示过滤/排序结果1 -->
     <ul id="filter-num">
@@ -52,19 +59,96 @@
     <ul id="filter-num2">
         <li v-for="n in even(numbers)">{{n}}</li>
     </ul>
+    <hr>
 
     <!-- 一段取值范围,理想结果为1 2 3 4 5 6 7 8 9 10 -->
-    <div>
-        <span v-for="n in 10">{{n}}</span>
+    <div id="count-1">
+        <span v-for="n in 10">{{n}} </span>
+    </div>
+    <hr>
+
+    <!-- 当他们处于同一节点时，v-for的优先级比v-if的优先级高，这意味着v-if将会重复运行于每个v-for循环中。
+    - 适用于想为仅有的一些项渲染节点。 -->
+    <div id="for-and-if-1">
+        <li v-for="todo in todos" v-if="!todo.isComplete">
+            {{ todo }}
+        </li>
+    </div>
+    <hr>
+
+    <!-- 有条件地跳过循环的执行，那么可以将 v-if 置于外层元素 (或 <template>)上。 -->
+    <div id="for-and-if-2">
+        <ul v-if="todos.length">
+            <li v-for="todo in todos">
+                {{todo}}
+            </li>
+        </ul>
+        <p v-else>No todos left!</p>
+    </div>
+
+    <!-- 终极大boss——v-for和组件 -->
+    <div id="todo-list-example">
+        <form v-on:submit.prevent="addNewTodo">
+            <label for="new-todo">Add a todo</label>
+            <input v-model="newTodoText" id="new-todo" placeholder="E.g Feed the cat">
+            <button>Add</button>
+        </form>
+        <ul>
+            <!-- is的用法相当于<todo-item>，因为ul中只接受li，所以用此方法替代 -->
+            <li 
+                is="todo-item" 
+                v-for="(todo,index) in todos" 
+                v-bind:key="todo.id"
+                v-bind:title="todo.title"
+                v-on:remove="todos.splice(index,1)"
+            ></li>
+        </ul>
     </div>
 
     <script>
+        //终极大boss——v-for和组件
+        Vue.component('todo-item',{
+            template: '<li>{{title}}<button v-on:click="$emit(\'remove\')">Remove</button><li>',
+            props:['title']
+        })
+        new Vue({
+            el: '#todo-list-example',
+            data: {
+                newTodoText: '',
+                todos: [
+                    {
+                        id: 1,
+                        title: 'Do the dishes',
+                    },
+                    {
+                        id: 2,
+                        title: 'Take out the trash',
+                    },
+                    {
+                        id:3,
+                        title: 'Mow the lawn'
+                    }
+                ],
+                nextTodoId:4
+            },
+            methods:{
+                addNewTodo: function () {  
+                    this.todos.push({
+                        id:this.nextTodoId++,
+                        title:this.newTodoText
+                    })
+                    this.newTodoText = ''
+                }
+            }
+        })
         //使用item in items的方式输出
         var example1 = new Vue({
             el: '#example-1',
             data: {
                 items: [{
-                        message: 'Foo'
+                        message: 'Foo1'
+                    }, {
+                        message: 'Foo2'
                     },
                     {
                         message: 'Bar'
@@ -100,10 +184,40 @@
                 }
             }
         })
+        //提供第二个的参数为键名
+        var vm = new Vue({
+            el: '#vm-for',
+            data: {
+                useProfile: {
+                    firstName: 'Crazy',
+                    lastName: 'Song',
+                }
+            }
+        })
+        //使用 xx.$set 实例方法，它只是全局 Vue.set 的别名：
+        vm.$set(vm.useProfile, 'interest', 'play')
+        //通过Vue.set的方法进行添加，结果也会显示在屏幕上
+        Vue.set(vm.useProfile, 'sex', 'girl')
+
+        var vm2 = new Vue({
+            el: '#vm-for2',
+            data: {
+                object: {
+                    firstName: 'Crazy',
+                    lastName: 'Song',
+                    age: 18
+                }
+            }
+        })
+        //添加多个新属性（响应式）：
+        vm2.object = Object.assign({}, vm2.object, {
+            sex: 'girl',
+            favoriteColor: 'red'
+        })
 
         //对之前的数据进行处理
         //1.调用变异方法：
-        example1.items.push({
+        example2.items.push({
             message: 'Baz'
         })
 
@@ -143,6 +257,48 @@
                 }
             }
 
+        })
+
+        var count1 = new Vue({
+            el: '#count-1'
+        })
+
+        var forif1 = new Vue({
+            el: '#for-and-if-1',
+            data: {
+                todos: [{
+                        todo: 'Hi',
+                        isComplete: true
+                    },
+                    {
+                        todo: 'Hello',
+                        isComplete: false
+                    },
+                    {
+                        todo: 'Welcome',
+                        isComplete: true
+                    }
+                ]
+            }
+        })
+
+        var forif2 = new Vue({
+            el: '#for-and-if-2',
+            data: {
+                todos: [{
+                        todo: 'Hi',
+                        isComplete: true
+                    },
+                    {
+                        todo: 'Hello',
+                        isComplete: false
+                    },
+                    {
+                        todo: 'Welcome',
+                        isComplete: true
+                    }
+                ]
+            }
         })
     </script>
 </body>
