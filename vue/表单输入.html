@@ -95,13 +95,20 @@
     </div>
     <hr>
 
+    <div id="form-11">
+        <label v-for="item in items">
+            <input type="checkbox" :value="item" v-model="selected">
+        </label>
+    </div>
+    <hr>
+
     <script>
-            var example = new Vue({
-                el: '#example',
-                data: {
-                    message: ''
-                }
-            })
+        var example = new Vue({
+            el: '#example',
+            data: {
+                message: ''
+            }
+        })
         var example1 = new Vue({
             el: '#example-1',
             data: {
@@ -155,6 +162,14 @@
                         value: 'C'
                     }
                 ]
+            }
+        })
+
+        var form11 = new Vue({
+            el: '#form-11',
+            data: {
+                items: [1, 2, 3, 4, 5],
+                selected: []
             }
         })
     </script>

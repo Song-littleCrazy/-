@@ -16,17 +16,26 @@
         <button v-on:click="counter += 1">Add 1</button>
         <p>The button above has clicked {{ counter }} times.</p>
     </div>
+    <hr>
 
     <!-- 直接接收方法名 -->
     <div id="example-2">
         <button v-on:click="greet">Greet</button>
     </div>
+    <hr>
 
     <!-- 在内联js中调用方法 -->
     <div id="example-3">
         <button v-on:click="say('hi')">Say hi</button>
         <button v-on:click="say('what')">Say what</button>
     </div>
+    <hr>
+
+    <div id="sub-1">
+        <p>通过按回车触发键盘事件</p>
+        <input v-on:keyup.enter="submit">
+    </div>
+    <hr>
 
     <script>
         var example1 = new Vue({
@@ -59,6 +68,16 @@
             methods: {
                 say: function(message) {
                     alert(message)
+                }
+            }
+        })
+
+        //通过按回车触发事件
+        var sub1 = new Vue({
+            el: '#sub-1',
+            methods: {
+                submit: function(){
+                    alert("message")
                 }
             }
         })

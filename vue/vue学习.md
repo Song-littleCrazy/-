@@ -327,7 +327,7 @@ Class与Style绑定
 -
 
   - 监听事件：
-    - v-on——监听DOM事件，并接收一些参数
+    - v-on——监听DOM事件，并接收一些参数。有以下三种方法：
       - 在触发时运行一些JavaScript代码
       - 直接接收函数名
       - 内联处理器中的方法
@@ -365,144 +365,203 @@ Class与Style绑定
 -
 
   - v-model
-    - 在表单`<input>`、`<textarea>`、`<select>`元素上创建双向数据绑定。根据控件类型自动选取正确的方法来更新元素。
+    - 在表单`<input>`、`<textarea>`、`<select>`元素上创建**双向数据绑定**。根据控件类型自动选取正确的方法来更新元素。
     - v-model会忽略所有表单元素的value、checked、selected特性的初始值而总是将Vue实例的数据（通过data声明初始值）作为数据来源。
-  - v-bind
+  - 几种类型：
+   - 文本
+     -  `<input v-model="message" placeholder="edit me">`
+     -  `<p>Message is: {{ message }}</p>`
+    -  多行文本
+      -  `<span>Multiline message is:</span>`
+      -  `<p style="white-space: pre-line;">{{ message }}</p>`
+      -  `<textarea v-model="message" placeholder="add multiple lines"></textarea>`
+    -  单个复选框，绑定到布尔值
+      -  `<input type="checkbox" id="checkbox" v-model="checked">`
+      - `<label for="checkbox">{{ checked }}</label>`
+      -  可以通过`true-value="xx"`和`false-value="xx"`来改变选中的值
+      - label用来为input元素定义标注，当选择label就会自动对焦到和标签相关的表番控件上。其for属性和对应的id属性相同。
+    - 多个复选框，绑定到同意数组
+      - `<div id='example-3'>`
+      - `<input type="checkbox" id="jack" value="Jack" v-model="checkedNames">`
+      - `<label for="jack">Jack</label>`
+      - `<input type="checkbox" id="john" value="John" v-model="checkedNames">`
+      - `<label for="john">John</label>`
+      - `<input type="checkbox" id="mike" value="Mike" v-model="checkedNames">`
+      - `<label for="mike">Mike</label>`
+      - `<span>Checked names: {{ checkedNames }}</span>`
+      - `</div>`
+      
+      - `new Vue({  el: '#example-3',  data: {  checkedNames: []  }  })`
+      - 注意，有多个值时，要把响应的值设为[],而单个值，用''表示空
+    - 单选按钮
+      - `<input type="radio" id="one" value="One" v-model="picked">`
+      - `<label for="one">One</label>`
+      - `<input type="radio" id="two" value="Two" v-model="picked">`
+      - `<label for="two">Two</label>`
+      - `<span>Picked: {{ picked }}</span>`
+    - 单选的选择框
+      - `<select v-model="selected">`
+      - `<option disabled value="">请选择</option>`
+      - `<option>A</option>`
+      - `<option>B</option>`
+      - `<option>C</option>`
+      - `</select>`
+      - `<span>Selected: {{ selected }}</span>`
+      - 如果 v-model 表达式的初始值未能匹配任何选项，`<select>` 元素将被渲染为“未选中”状态。在 iOS 中，这会使用户无法选择第一个选项。因为这样的情况下，iOS 不会触发 change 事件。因此，更推荐像上面这样提供一个值为空的禁用选项。
+    - 多选的选择框
+      -   `<select v-model="selected" multiple style="width: 50px;">`
+      -  `<option>A</option>`
+      -  `<option>B</option>`
+      -  `<option>C</option>`
+      -  `</select>`
+      -  `<span>Selected: {{ selected }}</span>`
+      -  也可以用v-for渲染
+      -  `<select v-model="selected">`
+      -  `<option v-for="option in options" v-bind:value="option.value">{{ option.text }}</option>`
+      -  `</select>`
+      -  `<span>Selected: {{ selected }}</span>`
+      
+      -  `data: {`
+      -  `  selected: 'A',`
+      -  `  options: [`
+      -  `    { text: 'One', value: 'A' },`
+      -  `    { text: 'Two', value: 'B' },`
+      -  `    { text: 'Three', value: 'C' }`
+      -  `  ]}`
+  - v-bind--值绑定
     - 把值绑定到vue实例的动态属性上，并且这个属性的值不可以为字符串。
   - 修饰符
     - .lazy：默认情况下，v-model在每次input事件触发后将输入框的值与数据进行同步。通过添加`v-model.lazy="msg"`转变为使用change事件进行同步。
     - .number：自动的将用户的输入值转换为数值类型。`<input v-model.number="age" type="number">`
     - .trim：自动过滤用户输入的首尾空白字符。`v-model.trim="msg"`
 
+补充一点: 关于绑定数据的说明:
+-
 
+vue的模板采用DOM模式,也就是说他的模板可以当作DOM节点运行,在浏览器不报错的情况下,绑定数据有三种方式:一种是插值,也就是{{ name }}的形式,一种是v-bind,还有一种是v-model.
 
-
-**组件系统**
----
-
-一个组件本质上是一个拥有预定义选项的一个vue实例。
-
- - 组件的复用性
-   - 每用一次组件，就会有一个新的实例被创建，各个实例之间互不影响。
-   - data必须是一个函数，这样每个实例可以维护一份被返回对象的对立拷贝。
- - 组件的组织
-   - 以一棵嵌套的组件树的形式来组织
-   - 注册类型：全局注册（`Vue.component`）和局部注册
- - 通过prop向子组件传递数据
-   - prop——在组件上注册的一些自定义特性。
-    - 当一个值传给一个prop特性的时候，它就会变成那个组件实例的一个属性。
-   - 一个组件默认可以拥有任意数量的prop，任何值都可以传递给任何prop。 
- - 单个根元素：
-   -  每个组件必须只有一个根元素
- -  通过事件向父级组件发送消息
-
-在一个大型应用中，有必要将整个应用程序划分为组件，以使来发更容易管理。这里有一个假想的例子，以展示使用了组件的应用模板是什么样的：
+ - 1. 插值
+ 
+{{ name }}的形式比较好理解,就是一文本的形式和示例data中对应的属性进行绑定.
 
 >
-    <div id="app">
-      <app-nav></app-nav>
-      <app-view>
-        <app-sidebar></app-sidebar>
-        <app-content></app-content>
-      </app-view>
+    var app = new Vue({
+      el: '#app',
+      template: '<div @click="toggleName">{{name}}</div>',
+      data: {
+         name: 'tom',
+      },
+      method: {
+       toggleName() {
+         this.name = this.name === 'tom' ? 'sony' : 'tom'
+       },
+      },
+    })
+
+上面的字符串模板中，有一个{{name}}，它和data.name是绑定的，当data.name发生变化时，视图也发生变化。
+
+ - 2. v-bind
+
+用法是后面加冒号，跟上html元素的attributions.如:
+
+    <p v-bind:class="classed">
+    
+data.classed是什么值，它就会给class属性传递什么值，当data.classed发生变化的时候，class属性也发生变化，这非常适合用在通过css来实现动画效果的场合。
+
+除了class，其他大部分html原始的属性都可以通过这种方式来绑定，而且为了方便，它可以直接缩写成冒号形式
+
+ - 3.v-model
+ 
+v-model主要是用在表单元素中，它实现了双向绑定。
+
+**双向绑定**:简单的说就是默认情况下，实例的data.name发生变化的时候，对应的试图中也会发生变化。同时,还会反过来，在input中手动输入新的内容，会反过来修改data.name的值，如果在视图中其他地方使用到了data.name，那么这个地方就会因为data.name的变化而变化，从而实现关联动态效果。所以常用在表单中.
+
+ - 4. v-bind和v-model混用
+
+>
+    <input :value="name" v-model="body">
+    
+v-bind产生的效果不含有双向绑定，所以:value的效果就是让input的value属性值等于data.name的值，而v-model的效果是使input和data.body建立双向绑定，因此首先data.body的值会给input的value属性，其次，当input中输入的值发生变化的时候，data.body还会跟着改变。
+
+v-bind产生的效果不含有双向绑定，所以:value的效果就是让input的value属性值等于data.name的值，而v-model的效果是使input和data.body建立双向绑定，因此首先data.body的值会给input的value属性，其次，当input中输入的值发生变化的时候，data.body还会跟着改变。
+
+v-model建立的双向绑定对输入型元素input, textarea, select等具有优先权，会强制实行双向绑定，如果你愿意的话。
+
+这说明，**在单独的input中，同时使用v-bind和v-model是没有必要的，虽然不会造成冲突。**
+
+-
+
+在**一组输入**中，它们又要另当别论。一组输入包括单选组、复选组、下拉选项、下拉选项组。
+
+    
+    <label for="value in options">
+      <input type="checkbox" :value="value" v-model="selected">
+    </label>
+
+    data: {
+      options: [1, 2, 3, 4, 5],
+      selected: [],
+    }
+
+一组复选框，或者一组下拉选项组，也就是select mutiple="true"的情况，它们的结果是一个数组，而非单个值，因此data.selected是一个数组，当一个选项被选中之后，这个选项的value值会被加入到data.selected中（不是按options里面的顺序，而是操作过程中的逻辑）。这个时候:value就是有效的，因为它表示把options数组中对应的选项值传递给value，并不是双向绑定的意思，而只是传值过去（当然，当options中对应的值发生变化时，value值也会变化）。
+
+相当于说，v-bind负责value的值，v-model负责选中状态。当然，v-model是双向绑定，界面上你去勾选会影响data.selected的值，你在程序中操作了data.selected，也会反过来影响界面。v-model影响的是勾选效果，而v-bind影响的是值。（实际上，v-bind虽然只是影响值，但是也会影响勾选效果，比如本来一个选框是被勾选的，通过v-bind绑定值发生了变化，那么新来的值就不会在data.selected中，这个选项就不会被勾选。如果没有被勾选，改变后的值又在data.selected中，那又会被勾选上。）
+
+注意，只有当type="checkbox"是确定的情况下，才会让上述情况生效，type值不能是动态值，因为v-model被多次绑定同一个变量时，需要去检查type值，而如果这个时候type是动态的，比如用:type="type"进行动态绑定，就会导致模板编译报错。
+
+以上的含义在图中的表示:
+
+
+    <div id="form-11">
+      <label v-for="item in items">
+        <input type="checkbox" :value="item" v-model="selected">   
+      </label>
     </div>
 
-与自定义元素的关系：
-自定义元素——web组件规范的一部分。vue的组件语法部分参考了该规范。但有几个关键差别：
+    var form11 = new Vue({
+      el: '#form-11',
+      data: {
+        items: [1,2,3,4,5],
+        selected: []
+      }
+    })
+    
+选中的情况如下:
 
-  1. Web Components规范已经完成并通过，但未被所有浏览器元素实现。相比之下，vue组件不需要任何polyfill，并且在所有支持的浏览器之下保持一致，必要时，Vue组件也可以包装于原生自定义元素之内。
-  2. Vue组件提供了纯自定义元素不具备的一些重要功能，最突出的是跨组件数据流、自定义事件通信以及构建工具继承。
+![](https://i.imgur.com/GSyQVZq.png)
+
+在vue中找到对应的情况:
+
+![](https://i.imgur.com/5QkHadc.png)
+
+在console中修改items的值:
+![](https://i.imgur.com/AGfChzm.png)
+
+然后,此时可以看到,勾选的框也变了:
+
+![](https://i.imgur.com/lOiNKSE.png)
+
+然后再次进行勾选
+![](https://i.imgur.com/ZRo3QOa.png)
+
+对应的selected中就会出现:
+
+![](https://i.imgur.com/UrumUa1.png)
+
+ - 5.v-model其实是v-bind和v-on的语法糖
+
+    <input v-model="something">其实是<input v-bind:value="something" v-on:input="something = $event.target.value">的语法糖
+
+发现它由两部分组成：v-bind:value和v-on:input，必须是value属性和input事件，否则也不会等价于v-model，而且input事件里面，正好是something等于当前输入值。
 
 
-组件注册
+小结
 -
+总之，要区分v-bind和v-model，只需要记住三句话：
 
- - 组件名:
-   - kebab-case(短横线分隔命名)：定义和引用都要使用这种形式。直接在DOM中使用时，只有分隔符是有效的。
-   - PascalCase(驼峰式命名)：用驼峰定义，引用时两种方法都可以。
- - 全局注册
-   - `Vue.component('my-component-name',{   })`
-   - 注册后可以在任何新创建的Vue根实例的模板中。 
- - 局部注册
-   - 通过一个普通的JavaScript对象来定义组件，
-   - `var ComponentA = { /* ... */ }`
-    `var ComponentB = { /* ... */ }`
-   - 然后在component选项中定义你想要使用的组件。
-   - `new Vue({`
-      `el: '#app',`
-      `components: {`
-        `'component-a': ComponentA,`
-        `'component-b': ComponentB`
-        `}`
-    ` })`
-   - 注意：局部注册的组件在其子组件中不可用。
-
-
-prop
--
-
-  - Prop类型：
-    - 以字符串数组形式列出：
-    - `props: ['title', 'likes', 'isPublished', 'commentIds', 'author']`
-    - 以对象形式列出prop：
-    - `props: {  title: String,  likes: Number,  isPublished: Boolean,  commentIds: Array,  author: Object  }`
-  - 传递静态或动态Prop
-    - 静态：
-    `<blog-post title="My journey with Vue"></blog-post>`
-    - 动态：   
-    `<!-- 动态赋予一个变量的值 -->`
-	`<blog-post v-bind:title="post.title"></blog-post>`
-    `<!-- 动态赋予一个复杂表达式的值 -->`
-    `<blog-post v-bind:title="post.title + ' by ' + post.author.name"></blog-post>`
-    - 传入数字
-    - 传入布尔值
-    - 传入对象
-    - 传入一个对象的所有属性
-  - 单项数据流：
-    - 所有的prop都使得其父子prop之间形成了一个单向下行绑定。父级prop的更新会向下流动到子组件中，但反过来不行。这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流难以理解。
-    - 两种常见的试图改变一个prop的情形：
-      - 1、这个prop用来传递一个初始值；这个子组件接下来希望将其作为一个本地的prop数据来使用。（定义一个本地的data属性，并将这个prop用作其初始值）
-      - 2、这个prop以一种原始的值传入，且需要进行转换。（最好使用这个prop值历来定义一个计算属性）
-  - prop验证
-    - 类型检查type：
-      - 既可以是原生构造函数（String、Number、Boolean、Array、Object、Date、Function、Symbol）中的一个
-      - 也可以是自定义的构造函数，并通过instanceof来进行检查确认。
-  - 非prop特性
-    - 一个非prop特性是指向一个组件，但是该组件并没有相应的prop定义的特性。
-    - 替换或合并已有的特性
-      - type="text"会被type="date"替换
-      - class和style的值会被合并
-    - 禁用特性继承
-       - 通过在组件的选项中设置`inheritAttrs:false`
-       - 尤其适用于配合实例的`$attrs`属性的使用，该属性包含了传递给一个数组的特性名和特性值
-
-
-自定义事件
--
-
-  - 事件名
-    - 没有大小写的限制
-    - 推荐使用kebab-case的事件名
-  - 自定义组件的v-model
-  - 将原生事件绑定到组件
-  - .sync修饰符
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+1. v-bind是数据绑定，没有双向绑定效果，但不一定在表单元素上使用，任何有效元素上都可以使用；
+2. v-model是双向绑定，基本上只用在表单元素上；
+3. 当v-bind和v-model同时用在一个元素上时，它们各自的作用没变，但v-model优先级更高，而且需区分这个元素是单个的还是一组出现的。
 
 
 
