@@ -2,6 +2,8 @@ vue学习：
 ---
 vue是一套用于构建用户界面的渐进式框架。
 
+![](https://i.imgur.com/k36D8r7.jpg)
+
 背景：
 -
 在创建一个项目的过程中，js的代码越来越多，所以需要引入各种JavaScript的框架，诸如angular、react、vue等。

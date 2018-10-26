@@ -11,22 +11,148 @@
 </head>
 
 <body>
-    <!-- <blog-post title="My journey with vue"  v-on:enlarge-text="postFontSize += 0.1"></blog-post>
-    <blog-post title="Blogging with vue"  v-on:enlarge-text="postFontSize += 0.1"></blog-post>
-    <blog-post title="Why vue is so fun"></blog-post> -->
+    <div id="components-demo">
+        <p>组件可以被复用，即添加多个组件，且它们之间互不影响</p>
+        <button-counter></button-counter>
+        <!-- 组件可以被复用，即添加多个组件，且它们之间互不影响 -->
+        <!-- 注意当点击按钮时，每个组件都会各自独立维护它的 count。因为你每用一次组件，就会有一个它的新实例被创建。 -->
+        <button-counter></button-counter>
+        <button-counter></button-counter>
+    </div>
+    <hr>
+
+    <div id="components-demo2">
+        <p>也可以设置变量，控制它们一起变化</p>
+        <button-counter2></button-counter2>
+        <button-counter2></button-counter2>
+        <button-counter2></button-counter2>
+    </div>
+    <hr>
+
+    <div id="demo-3">
+        <p>title直接写在组件的框里</p>
+        <blog-post title="My journey with vue"></blog-post>
+        <blog-post title="Blogging with vue"></blog-post>
+        <blog-post title="You know why vue is so cute"></blog-post>
+    </div>
+    <hr>
+
+    <div id="demo-4">
+        <p>用for循环，title写在data里</p>
+        <blog-post-demo v-for="post in posts" v-bind:key="post.id" v-bind:title="post.title"></blog-post-demo>
+    </div>
+    <hr>
+
+    <div id="demo-5">
+        <p>当接收n多个参数时，直接把它们写在一个post里</p>
+        <blog-post-all v-for="post in posts" v-bind:key="post.id" v-bind:post="post"></blog-post-all>
+    </div>
+    <hr>
+
 
     <div id="blog-posts-events-demo">
+        <p>通过事件向父级组件发送消息</p>
         <div :style="{ fontSize: postFontSize + 'em' }">
             <blog-post v-for="post in posts" v-bind:key="post.id" v-bind:post="post" v-on:enlarge-text="postFontSize += 0.1"></blog-post>
         </div>
     </div>
-
+    <hr>
 
     <script>
-        // Vue.component('blog-post',{
-        //     props: ['title'],
-        //     template: '<h3>{{ title }}</h3>'
-        // })
+        Vue.component('button-counter', {
+            // 一个组件的 data 选项必须是一个函数
+            // 因此每个实例可以维护一份被返回对象的独立的拷贝
+            data: function () {
+                return {
+                    count: 0
+                }
+            },
+            template: '<button v-on:click="count++">You clicked {{count}} times. </button>'
+        })
+        var demo1 = new Vue({
+            el: '#components-demo'
+        })
+
+
+        var buttoncounterData = {
+            count: 0
+        }
+        Vue.component('button-counter2', {
+            //点击一个按钮也可能会像如下代码一样影响到其它所有实例：
+            data: function () {
+                return buttoncounterData
+            },
+            template: '<button v-on:click="count++">You clicked {{count}} times. </button>'
+        })
+        var demo2 = new Vue({
+            el: '#components-demo2'
+        })
+
+        Vue.component('blog-post', {
+            props: ['title'],
+            template: '<h3>{{ title }}</h3>'
+        })
+        var demo3 = new Vue({
+            el: '#demo-3'
+        })
+
+        Vue.component('blog-post-demo', {
+            props: ['title'],
+            template: '<h3>{{title}}</h3>'
+        })
+        var demo4 = new Vue({
+            el: '#demo-4',
+            data: {
+                posts: [{
+                        id: 1,
+                        title: 'Hi,'
+                    },
+                    {
+                        id: 2,
+                        title: 'I am'
+                    },
+                    {
+                        id: 3,
+                        title: 'crazy'
+                    }
+                ]
+            } //,
+
+            //例子来源于——从一个 API 获取博文列表https://jsfiddle.net/chrisvfritz/sbLgr0ad
+            // created: function(){
+            //     var vm = this
+            //     fetch('https://jsonplaceholder.typicode.com/posts')
+            //         .then(function(response) {
+            //             return response.json()
+            //         })
+            //         .then(function(data){
+            //             vm.posts = data
+            //         })
+            // }
+        })
+
+        Vue.component('blog-post-all', {
+            props: ['post'],
+            template: '<div class="blog-post-all"><h3>{{ post.title }}</h3><div v-html="post.content"></div></div>'
+        })
+        var demo5 = new Vue({
+            el: '#demo-5',
+            data: {
+                posts: [{
+                        title: 'title1',
+                        content: 'content1'
+                    },
+                    {
+                        title: 'title2',
+                        content: 'content2'
+                    }, 
+                    {
+                        title: 'title3',
+                        content: 'content3'
+                    }
+                ]
+            }
+        })
 
         Vue.component('blog-post', {
             props: ['post'],
@@ -48,7 +174,7 @@
                     title: "Why vue is so fun",
                     content: 'intersting'
                 }],
-                postFontSize : 1
+                postFontSize: 1
             }
         })
     </script>
