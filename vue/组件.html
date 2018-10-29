@@ -53,8 +53,30 @@
     <div id="blog-posts-events-demo">
         <p>通过事件向父级组件发送消息</p>
         <div :style="{ fontSize: postFontSize + 'em' }">
+            <!-- 实践处理函数是 一个算式  -->
             <blog-post v-for="post in posts" v-bind:key="post.id" v-bind:post="post" v-on:enlarge-text="postFontSize += 0.1"></blog-post>
         </div>
+    </div>
+    <hr>
+
+    <div id="blog-posts-events-demo2">
+        <p>通过事件向父级组件发送消息2</p>
+        <div :style="{ fontSize: postFontSize + 'em' }">
+            <!-- 实践处理函数是 一个方法  -->
+            <blog-post v-for="post in posts" v-bind:key="post.id" v-bind:post="post" v-on:enlarge-text="onEnlargeText"></blog-post>
+        </div>
+    </div>
+    <hr>
+
+    <!-- <div id="demo-6">
+        <p>input的组件写法</p>
+        <custom-input v-model="searchText"></custom-input>
+    </div> -->
+
+    <div id="dynamic-component-demo" class="demo">
+        <p>动态组件——再一个多标签的界面里：</p>
+        <button v-for="tab in tabs" v-bind:key="tab" v-bind:class="['tab-button',{ active: currentTab === tab }]" v-on:click="currentTab = tab">{{tab}}</button>
+        <component v-bind:is="currentTabComponent" class="tab"></component>
     </div>
     <hr>
 
@@ -171,10 +193,79 @@
             data: {
                 posts: [{
                     id: 1,
-                    title: "Why vue is so fun",
+                    title: "进行内容放大",
                     content: 'intersting'
                 }],
                 postFontSize: 1
+            }
+        })
+
+        //使用事件抛出一个值，通过$emit的第二个参数来提供这个值
+        Vue.component('blog-post', {
+            props: ['post'],
+            template: `
+                <div class="blog-post">
+                    <h3>{{post.title}}</h3>
+                    <button v-on:click="$emit('enlarge-text',0.2)">
+                        Enlarge text
+                    </button>
+                    <div v-html="post.content"></div>
+                </div>
+            `
+        })
+        new Vue({
+            el: '#blog-posts-events-demo2',
+            data: {
+                posts: [{
+                    id: 1,
+                    title: "进行内容放大",
+                    content: '内容1'
+                },
+                {
+                    id: 2,
+                    title: "进行内容放大",
+                    content: '内容2'
+                }],
+                postFontSize: 1
+            },
+            //将值作为参数，传给这个方法
+            methods: {
+                onEnlargeText : function(enlargeAmount) {
+                    this.postFontSize += enlargeAmount
+                }
+            }
+        })
+
+        // Vue.component(
+        //     'custom-input',{
+        //         porps: ['value'],
+        //         template: '<input v-bind:value="value" v-on:input="$emit(\'input\',$event.target.value)">'
+        // })
+        // var demo6 = new Vue({
+        //     el:'#demo-6'
+        // })
+
+        //动态切换
+        Vue.component('tab-home',{
+            template: '<div>Home component</div>'
+        })
+        Vue.component('tab-posts',{
+            template: '<div>Posts component</div>'
+        })
+        Vue.component('tab-archive',{
+            template: '<div>Archive component</div>'
+        })
+        new Vue({
+            el: '#dynamic-component-demo',
+            data: {
+                currentTab:'Home',
+                tabs:['Home','Posts','Archive']
+            },
+            //currentTabComponent 可以包括:(1)一个组件的选项对象（2）或已注册的组件的名字
+            computed: {
+                currentTabComponent: function(){
+                    return 'tab-' + this.currentTab.toLowerCase()
+                }
             }
         })
     </script>

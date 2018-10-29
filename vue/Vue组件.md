@@ -20,6 +20,16 @@
  - 单个根元素：
    -  每个组件必须只有一个根元素
  -  通过事件向父级组件发送消息
+   - 通过调用内建的 $emit 方法 并传入事件的名字，来向父级组件触发一个事件 
+ - 动态组件
+ - 解析DOM模板时的注意事项
+   - 由于有些HTML元素，诸如`<ul><ol><table><select>`,对于那些元素可以出项在其内部是有严格限制的。而有些元素，诸如`<li><tr><option>`只能出现在其它某些特定元素的内部。
+   - 所以需要 is 特性给我们一个变通的方法，引入组件。
+   - `<table><tr is="blog-post-row"></tr></table>`
+   - 以下来源使用模板不存在限制：
+     - 字符串（template:'...'）
+     - 单文件组件（.vue）
+     - `<script type="text/x-template">` 
 
 在一个大型应用中，有必要将整个应用程序划分为组件，以使来发更容易管理。这里有一个假想的例子，以展示使用了组件的应用模板是什么样的：
 
@@ -43,11 +53,13 @@
 -
 
  - 组件名:
-   - kebab-case(短横线分隔命名)：定义和引用都要使用这种形式。直接在DOM中使用时，只有分隔符是有效的。
+   - Vue.component的第一个参数
+   - kebab-case(短横线分隔命名)：定义和引用都要使用这种形式。直接在DOM（即非字符串的模板）中使用时，只有分隔符是有效的。
    - PascalCase(驼峰式命名)：用驼峰定义，引用时两种方法都可以。
  - 全局注册
    - `Vue.component('my-component-name',{   })`
    - 注册后可以在任何新创建的Vue根实例的模板中。 
+   - 不够理想。比如，如果你使用一个向webpack的构建系统，全局注册所有的组件意味着即使你不再使用一个组件，它仍会被包含在最终的构建结果种。这会造成了用户下载的JavaScript的无谓的增加。
  - 局部注册
    - 通过一个普通的JavaScript对象来定义组件，
    - `var ComponentA = { /* ... */ }`
@@ -61,17 +73,26 @@
         `}`
     ` })`
    - 注意：局部注册的组件在其子组件中不可用。
+   - `var ComponentA = { /* ... */ }`
+    `var ComponentB = {`
+      `components: {component-a': ComponentA },`
+      `// ...`
+    `}`
+ - 模块系统
 
 
 prop
 -
 
-  - Prop类型：
+  - **Prop的大小写**
+    - HTML的特性名是大小写不敏感的，所以浏览器会把所有大写字符解释成小写字符。这意味着当你使用DOM模板时，camelCase（驼峰命名）的prop名需要使用其等价的kebab-case（短横线分割命名）。
+    - 如果使用字符串模板，则不存在这个限制。
+  - **Prop类型**
     - 以字符串数组形式列出：
     - `props: ['title', 'likes', 'isPublished', 'commentIds', 'author']`
     - 以对象形式列出prop：
     - `props: {  title: String,  likes: Number,  isPublished: Boolean,  commentIds: Array,  author: Object  }`
-  - 传递静态或动态Prop
+  - **传递静态或动态Prop**
     - 静态：
     `<blog-post title="My journey with Vue"></blog-post>`
     - 动态：   
@@ -80,36 +101,102 @@ prop
     `<!-- 动态赋予一个复杂表达式的值 -->`
     `<blog-post v-bind:title="post.title + ' by ' + post.author.name"></blog-post>`
     - 传入数字
+     - 静态
+     -  `<!-- 即便 "42" 是静态的，我们仍然需要 "v-bind" 来告诉 Vue -->`
+    `<!-- 这是一个 JavaScript 表达式而不是一个字符串。-->`
+    `<blog-post v-bind:likes="42"></blog-post>`
+      - 动态
+      - `<!-- 用一个变量进行动态赋值。-->`
+      - `<blog-post v-bind:likes="post.likes"></blog-post>`
     - 传入布尔值
+      - `<!-- 包含该 prop 没有值的情况在内，都意味着 true。-->`
+      - `<blog-post is-published></blog-post>`
+      - 静态：`<blog-post v-bind:is-published="false"></blog-post>`
+      - 动态：`<blog-post v-bind:is-published="post.isPublished"></blog-post>`
+    - 传入数组
+      - 静态：`<blog-post v-bind:comment-ids="[234, 266, 273]"></blog-post>`
+      - 动态`<blog-post v-bind:comment-ids="post.commentIds"></blog-post>`
     - 传入对象
+      - 静态：`<blog-post v-bind:author="{ name: 'Veronica', company: 'Veridian Dynamics' }"></blog-post>`
+      - 动态：`<blog-post v-bind:author="post.author"></blog-post>`
     - 传入一个对象的所有属性
-  - 单项数据流：
-    - 所有的prop都使得其父子prop之间形成了一个单向下行绑定。父级prop的更新会向下流动到子组件中，但反过来不行。这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流难以理解。
+  - **单项数据流**：
+    - 所有的prop都使得其父子prop之间形成了一个**单向下行绑定**。父级prop的更新会向下流动到子组件中，但反过来不行。这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流难以理解。
+    - 额外的，每次父级组件发生更新时，子组件中所有的prop都将会刷新为最新的值。这意味着——不应该在一个子组件的内部改变prop。否则。Vue在浏览器的控制台就hi发出警报。
     - 两种常见的试图改变一个prop的情形：
       - 1、这个prop用来传递一个初始值；这个子组件接下来希望将其作为一个本地的prop数据来使用。（定义一个本地的data属性，并将这个prop用作其初始值）
       - 2、这个prop以一种原始的值传入，且需要进行转换。（最好使用这个prop值历来定义一个计算属性）
-  - prop验证
+  - **prop验证**
     - 类型检查type：
       - 既可以是原生构造函数（String、Number、Boolean、Array、Object、Date、Function、Symbol）中的一个
       - 也可以是自定义的构造函数，并通过instanceof来进行检查确认。
-  - 非prop特性
+  - **非prop特性**
     - 一个非prop特性是指向一个组件，但是该组件并没有相应的prop定义的特性。
     - 替换或合并已有的特性
       - type="text"会被type="date"替换
       - class和style的值会被合并
     - 禁用特性继承
-       - 通过在组件的选项中设置`inheritAttrs:false`
+       - 通过在组件的选项中设置`inheritAttrs:false`不继承根元素的特性
        - 尤其适用于配合实例的`$attrs`属性的使用，该属性包含了传递给一个数组的特性名和特性值
+       
+>
+     Vue.component('base-input', {
+      inheritAttrs: false,
+      props: ['label', 'value'],
+      template: `
+        <label>
+          {{ label }}
+         <input
+          v-bind="$attrs"
+          v-bind:value="value"
+          v-on:input="$emit('input',   $event.target.value)"
+         >
+        </label>
+      `
+    })
 
 
 自定义事件
 -
 
   - 事件名
-    - 没有大小写的限制
-    - 推荐使用kebab-case的事件名
+    - 事件名不存在任何自动化的大小写转换，而是触发的事件名需要完全匹配监听这个事件所用的函数。
+    - 推荐使用kebab-case的事件名。
   - 自定义组件的v-model
+    - 一个组件上的v-model默认会利用名为value 的prop和名为input的事件，但单选框、复选框等类型的输入控件可能会将value特性用于不同的目的。model选项可以用来避免这样的冲突。
+    
+    - `<input v-bind:value="searchText" v-on:input="searchText = $event.target.value">`
+    - 将this.searchText的值通过名为value的prop传入input组件内，而后当input事件触发时将事件带来的input的新值写入this.searchText中，然后根据this.searchText中值的变化通过value的prop传入input控件完成input控件上值的变化，如果去掉v-on...后，这个控件将变为一个只读控件。
+    - 具体参考[http://http://www.cnblogs.com/sonoda-umi/p/9750188.html](http://http://www.cnblogs.com/sonoda-umi/p/9750188.html)
+    - 通过设置下面的代码：
+    - 使其为：
+    - `<base-checkbox v-model="lovingVue"></base-checkbox>`
+    - 将原来v-model默认使用的名为value的prop与名为input的event自定义一个名字使用，在上面自定义组件中存在
+    - `props: {    checked: Boolean  }`
+   >
+    Vue.component('base-checkbox', {
+      model: {
+        prop: 'checked',
+        event: 'change'
+      },
+      props: {
+        checked: Boolean
+      },
+      template: `
+    <input
+      type="checkbox"
+      v-bind:checked="checked"
+      v-on:change="$emit('change', $event.target.checked)"
+    >
+      `
+    })
+   
+    
+   
   - 将原生事件绑定到组件
+    - 通过使用`v-on的.native修饰符`把一个组件的根元素上直接监听一个原生事件
+    - 当监听一个类似`<input>`的非常特定的元素时，可能会失败，不会报错，但调用的函数不会被调用。
+    - 使用$listeners属性，它是一个对象，包含了作用在这个组件上的所有监听器。所以通过`v-on="$listeners"`将所有的事件监听器指向这个组件的某个特定的子元素。
   - .sync修饰符
 
 
