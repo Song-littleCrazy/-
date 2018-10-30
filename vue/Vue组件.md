@@ -193,17 +193,104 @@ prop
    
     
    
-  - 将原生事件绑定到组件
+  - .native将原生事件绑定到组件
     - 通过使用`v-on的.native修饰符`把一个组件的根元素上直接监听一个原生事件
     - 当监听一个类似`<input>`的非常特定的元素时，可能会失败，不会报错，但调用的函数不会被调用。
     - 使用$listeners属性，它是一个对象，包含了作用在这个组件上的所有监听器。所以通过`v-on="$listeners"`将所有的事件监听器指向这个组件的某个特定的子元素。
   - .sync修饰符
+    - 进行双向绑定
+    - 在一个包含 title prop 的假设的组件中，我们可以用以下方法表达对其赋新值的意图：
+    - `this.$emit('update:title', newTitle)`
+    - 然后父组件可以监听那个事件并根据需要更新一个本地的数据属性。例如：
+    - `<text-document  v-bind:title="doc.title"  v-on:update:title="doc.title = $event"></text-document>`
+    - 为了方便起见，我们为这种模式提供一个缩写，即 .sync 修饰符：
+    - `<text-document v-bind:title.sync="doc.title"></text-document>`
+    - 注意：
+      - 带有.sync修饰符的v-bind不能和表达式一起用
+      - 当一个对象同时设置多个prop时，可以将.sync和v-bind配合使用。
+      - `<text-document v-bind.sync="doc"></text-document>`
+      - 这样会把doc对象中的每一个属性都作为一个独立的prop传进去，然后各自添加用于更行的v-on监听器。
 
 
+插槽
+-
+
+- 插槽内容
+  - 通过在组件米板中设置`<slot></slot>`来被替换成相应的模板。
+- 具名插槽
+  - 通过在`<slot name="XX">`来定义额外的插槽，便于区分。
+  - 在一个父组件的<template>元素上使用slot:`<template slot="XX"><p>...</p></template>`
+  - 把slot直接用在一个普通元素上`<p slot="XX">...</p>`
+  - 还可以保留一个未命名插槽——默认插槽，作为所有未匹配到插槽的内容的同意出口。
+- 插槽的默认内容
+  - 如：一个按钮的默认内容为“submit”，但同时允许用户复写为“save”、“update”等。可以这样设置：
+  - `<button type="submit"><slot>Submit</slot></button>`
+  - 如果父组件为这个插槽提供了内容，则默认的内容会被替换掉。
+- 编译作用域
+  - 父组件模板的所有东西都会在父级作用域内编译；子组件模板的所有东西都会在子级作用域内编译。
+- 作用域插槽
+  - 用于渲染出和每个独立的待办事项不一样的东西。
+  - 用法：将待办事项包裹在一个和`<slot>`元素上，然后将所有和其上下文相关的数据传递给这个插槽。
+  - 注意：`slot-scope`不再限制在`<template>`元素上使用，而可以用在插槽内的任何元素。
 
 
+动态组件&异步组件
+-
+
+- 动态组件——`keep-alive`：
+  - 在第一次创建的时候被缓存下来，避免重复渲染。
+- 异步组件：
+  - Vue允许以一个工厂函数的方式定义组件，实现异步解析组件的定义。Vue只有在这个组件需要被渲染的时候才会触发这个工厂函数，并且会把结果缓存起来供未来重渲染。
+  - 推荐和webpack的code-spltting功能一起配合使用。
 
 
+处理边界情况
+-
 
+- **访问元素 & 组件**
+-  1.访问根实例——$root
+ - 当demo或非常小型的有少量组件的应用来说比较方便。大型应用推荐——vuex来管理应用的状态。
+   >  
+    // Vue 根实例
+    new Vue({
+      data: {
+      foo: 1
+      },
+      computed: {
+        bar: function () { /* ... */ }
+      },
+      methods: {
+        baz: function () { /* ... */ }
+      }
+    })
+    // 获取根组件的数据
+    this.$root.foo   
+    // 写入根组件的数据
+    this.$root.foo = 2  
+    // 访问根组件的计算属性
+    this.$root.bar   
+    // 调用根组件的方法
+    this.$root.baz()
+
+- 2.访问父级元素组件——$parent
+  - 提供了一种可以在后期随时触达父级组件，以替代将数据以prop的方式传入子组件的方式。
+- 3.访问子组件示例或子元素——$refs
+  - 通过ref为子组件赋予一个ID引用：
+  - `<base-input ref="usernameInput"></base-input>`
+  - 使用`this.$refs.usernameInput`访问<base-input>实例，以备不时之需
+  - $refs只会在组件渲染完成后生效，并且它们不是响应式的。这只意味着一个直接的子组件封装的“逃生舱”——应该避免在模板或计算属性中访问$refs
+- 4.依赖注入
+  - provide——指定**提供**给后代组件的数据/方法
+  - inject——接收指定的想要添加在这个实例上的属性
+  - 把依赖注入看作一部分“大范围有效的prop”，除了：
+    - 祖先组件不需要知道哪些后代组件使用它提供的那些属性
+    - 后代组件不需要知道被注入的属性来自哪里
+  - 依赖注入的负面影响:将应用以目前的组织方式耦合起来，使重构变得比较困难。同时提供的属性是非响应式的。
+
+- **程序化的事件侦听器**
+  - $emit被v-on侦听
+  - 通过$on(eventName,eventHandler)侦听一个事件
+  - 通过 $once(eventName, eventHandler) 一次性侦听一个事件
+  - 通过 $off(eventName, eventHandler) 停止侦听一个事件
 
 
